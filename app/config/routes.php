@@ -78,8 +78,17 @@ $router->group('', function (Router $router) use ($app) {
 
         // Traitement de l'ajout de ville
         $router->post('/ajouter', [$ville_controller, 'add']);
+
+        // Voir les besoins d'une ville
+        $router->get('/@id/besoins', [$ville_controller, 'besoins']);
     });
 
+    // Gestion des distributions
+    $router->group('/distributions', function (Router $router) use ($app) {
+        $don_controller = new DonController();
 
+        // Liste des distributions (avec filtre optionnel par ville)
+        $router->get('/', [$don_controller, 'distributions']);
+    });
 
 });
