@@ -25,18 +25,18 @@ ob_start();
 <!-- Actions -->
 <div class="row mb-3">
     <div class="col-12">
-        <a href="/" class="btn btn-secondary">
+        <a href="<?= BASE_URL ?>/" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Retour au Dashboard
         </a>
         <?php if (isset($ville) && $ville): ?>
-            <a href="/distributions" class="btn btn-info">
+            <a href="<?= BASE_URL ?>/distributions" class="btn btn-info">
                 <i class="fas fa-list"></i> Toutes les Distributions
             </a>
-            <a href="/villes/<?= $ville['id'] ?>/besoins" class="btn btn-primary">
+            <a href="<?= BASE_URL ?>/villes/<?= $ville['id'] ?>/besoins" class="btn btn-primary">
                 <i class="fas fa-list-ul"></i> Voir les Besoins
             </a>
         <?php else: ?>
-            <a href="/villes" class="btn btn-info">
+            <a href="<?= BASE_URL ?>/villes" class="btn btn-info">
                 <i class="fas fa-city"></i> Voir les Villes
             </a>
         <?php endif; ?>

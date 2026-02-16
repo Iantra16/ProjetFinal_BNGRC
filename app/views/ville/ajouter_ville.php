@@ -26,7 +26,7 @@ ob_start();
                                 </div>
                             <?php endif; ?>
 
-                            <form method="POST" action="/villes/ajouter">
+                            <form method="POST" action="<?= BASE_URL ?>/villes/ajouter">
                                 <div class="form-group">
                                     <label for="nom">
                                         <i class="fas fa-city"></i> Nom de la Ville *
@@ -66,7 +66,7 @@ ob_start();
                                             </button>
                                         </div>
                                         <div class="col-6">
-                                            <a href="/villes" class="btn btn-secondary btn-block btn-avec-icone">
+                                            <a href="<?= BASE_URL ?>/villes" class="btn btn-secondary btn-block btn-avec-icone">
                                                 <i class="fas fa-arrow-left"></i> Retour
                                             </a>
                                         </div>

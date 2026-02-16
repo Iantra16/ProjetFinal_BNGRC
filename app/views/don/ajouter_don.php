@@ -25,7 +25,7 @@ ob_start();
                 </h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="/dons/ajouter">
+                <form method="POST" action="<?= BASE_URL ?>/dons/ajouter">
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
@@ -116,7 +116,7 @@ ob_start();
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-save"></i> Enregistrer le Don
                         </button>
-                        <a href="/dons" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/dons" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Retour
                         </a>
                     </div>

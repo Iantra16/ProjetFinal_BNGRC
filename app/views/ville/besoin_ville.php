@@ -17,13 +17,13 @@ ob_start();
 <!-- Actions -->
 <div class="row mb-3">
     <div class="col-12">
-        <a href="/besoins" class="btn btn-primary">
+        <a href="<?= BASE_URL ?>/besoins" class="btn btn-primary">
             <i class="fas fa-plus"></i> Ajouter un Besoin
         </a>
-        <a href="/" class="btn btn-secondary">
+        <a href="<?= BASE_URL ?>/" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Retour au Dashboard
         </a>
-        <a href="/villes" class="btn btn-info">
+        <a href="<?= BASE_URL ?>/villes" class="btn btn-info">
             <i class="fas fa-city"></i> Toutes les Villes
         </a>
     </div>
@@ -90,7 +90,7 @@ ob_start();
                 <i class="fas fa-info-circle fa-3x mb-3"></i>
                 <h4>Aucun besoin enregistré</h4>
                 <p>Cette ville n'a pas encore de besoins enregistrés.</p>
-                <a href="/besoins" class="btn btn-primary mt-3">
+                <a href="<?= BASE_URL ?>/besoins" class="btn btn-primary mt-3">
                     <i class="fas fa-plus"></i> Ajouter le premier besoin
                 </a>
             </div>

@@ -22,7 +22,7 @@ ob_start();
                 </h3>
             </div>
             <div class="card-body">
-                <form action="/besoins/ajouter" method="POST">
+                <form action="<?= BASE_URL ?>/besoins/ajouter" method="POST">
                     <div class="mb-3">
                         <label for="ville_id" class="form-label">Ville</label>
                         <select class="form-select" id="ville_id" name="ville_id" required>

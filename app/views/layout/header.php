@@ -1,7 +1,7 @@
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-dark bngrc-navbar">
         <div class="container-fluid">
-            <a class="navbar-brand bngrc-brand" href="/">
+            <a class="navbar-brand bngrc-brand" href="<?= BASE_URL ?>/">
                 <i class="fas fa-hands-helping"></i>
                 <span class="brand-text">BNGRC - Suivi des Dons</span>
             </a>
@@ -12,27 +12,27 @@
 
             <ul class="navbar-nav ms-auto bngrc-nav">
                 <li class="nav-item">
-                    <a href="/articles" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/articles') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/articles" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/articles') !== false ? ' active' : '' ?>">
                         <i class="fas fa-boxes"></i> Articles
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
                         <i class="fas fa-list-ul"></i> Besoins
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/villes" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/villes') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/villes" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/villes') !== false ? ' active' : '' ?>">
                         <i class="fas fa-city"></i> Villes
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/dons" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/dons') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/dons" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/dons') !== false ? ' active' : '' ?>">
                         <i class="fas fa-gift"></i> Dons
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/distributions" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/distributions') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/distributions" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/distributions') !== false ? ' active' : '' ?>">
                         <i class="fas fa-truck"></i> Distributions
                     </a>
                 </li>

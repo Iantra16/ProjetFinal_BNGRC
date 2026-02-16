@@ -36,7 +36,7 @@ ob_start();
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="/articles/ajouter" id="formArticle">
+                <form method="POST" action="<?= BASE_URL ?>/articles/ajouter" id="formArticle">
                     <!-- Nom de l'article -->
                     <div class="mb-3">
                         <label for="nom" class="form-label">
@@ -134,7 +134,7 @@ ob_start();
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Enregistrer l'article
                         </button>
-                        <a href="/articles" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/articles" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Annuler
                         </a>
                     </div>
