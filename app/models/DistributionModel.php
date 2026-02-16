@@ -22,12 +22,37 @@ class DistributionModel
         return $this->db->lastInsertId();
     }
 
+    public function GetAllDistributoin() {
+        
+            // Récupérer toutes les distributions
+            $sql = $this->db->prepare(
+                "SELECT * FROM v_historique_distributions_villes"
+            );
+            $sql->execute();
+            $distributions = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            return $distributions;
+    }
+
+    public function Distributoin_VIlle($id_ville) {
+        $sql = $this->db->prepare(
+            "SELECT * FROM v_historique_distributions_villes WHERE ville_id = ?"
+        );
+        $sql->execute([$id_ville]);
+        return $sql->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     public function DistributoinDons($dons_ville_detaille) { 
         $ListeDistributoin = [];
         foreach ($dons_ville_detaille as $dons) {
             $besoinModel = new BesoinModel($this->db);
             $besoins = $besoinModel->getReste_besoin_by_article($dons['id_article']);
             $nb_ville = count($besoins);
+
+            // Correction : Éviter la division par zéro si aucun besoin n'existe pour cet article
+            if ($nb_ville === 0) {
+                continue;
+            }
+
             $moyen = floor($dons['stock_restant'] / $nb_ville);
             $id = 1;
 
@@ -36,29 +61,31 @@ class DistributionModel
                 $distribuer = 0;
 
                 if ($moyen >= $besoin['reste_a_combler']) {
-                    // Si oui, on peut enregistrer la distribution dans la base de données
+                    // Si le stock moyen suffit pour combler le besoin
                     $distribuer = $besoin['reste_a_combler'];
-                    $Q1 = $moyen - $besoin['reste_a_combler'];
-                    $moyen = $moyen + ($Q1/($nb_ville - $id));
-                    
+                    if ($nb_ville - $id > 0) {
+                        $Q1 = $moyen - $besoin['reste_a_combler'];
+                        $moyen = $moyen + ($Q1 / ($nb_ville - $id));
+                    }
                 }
                 else {
-                    $distribuer = $moyen;
-                    $Q1 = 0;
+                    // Si le stock moyen ne suffit pas
+                    $distribuer = floor($moyen);
                 }
                 
-                    $distribution[] = [
+                // On n'ajoute que si on distribue effectivement quelque chose
+                if ($distribuer > 0) {
+                    $ListeDistributoin[] = [
                         'id_don_article' => $dons['id_don_article'],
                         'id_besoin_article' => $besoin['id_besoin_article'],
-                        'quantite_attribuee' => $distribuer
+                        'quantite_attribuee' => $distribuer,
+                        'article_nom' => $dons['article'],
+                        'ville_nom' => $besoin['ville'],
+                        'unite' => $dons['unite']
                     ];
+                }
 
-                    $ListeDistributoin[] = $distribution;
-                    
-                    // si inserena anaty base de données
-                    // $this->create($dons['id_don_article'], $besoin['id_besoin_article'], $distribuer);
-
-                $id ++;
+                $id++;
             }
         }
         return $ListeDistributoin;

@@ -1,0 +1,163 @@
+<?php 
+$title = "Simulateur de Distribution - BNGRC";
+ob_start();
+?>
+
+<div class="page-header mb-4">
+    <h1 class="page-title">
+        <i class="fas fa-magic"></i> Simulateur de Distribution
+    </h1>
+    <p class="page-subtitle">
+        Visualisez comment les dons actuels pourraient être répartis entre les villes selon leurs besoins.
+    </p>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12 text-end">
+        <button id="btn-simuler" class="btn btn-lg btn-success shadow">
+            <i class="fas fa-play"></i> Lancer la Simulation
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Stock Disponible -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-warehouse"></i> Stock Disponible</h5>
+                <span class="badge bg-primary"><?= count($restdons) ?> articles</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Article</th>
+                                <th class="text-end">Reste</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($restdons as $don): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($don['article']) ?></td>
+                                    <td class="text-end">
+                                        <strong><?= number_format($don['stock_restant'], 0, ',', ' ') ?></strong>
+                                        <small class="text-muted"><?= htmlspecialchars($don['unite']) ?></small>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résultats de la Simulation -->
+    <div class="col-md-7 mb-4">
+        <div id="simulation-loading" class="text-center py-5 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Calcul en cours...</span>
+            </div>
+            <p class="mt-2">Calcul de la distribution optimale...</p>
+        </div>
+
+        <div id="simulation-placeholder" class="card border-dashed h-100 text-center py-5 d-flex align-items-center justify-content-center">
+            <div class="text-muted">
+                <i class="fas fa-chart-line fa-4x mb-3 opacity-25"></i>
+                <h5>Aucune simulation en cours</h5>
+                <p>Cliquez sur le bouton "Lancer la Simulation" pour voir les résultats.</p>
+            </div>
+        </div>
+
+        <div id="simulation-container" class="card shadow-sm h-100 d-none">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Plan de Distribution Stimulé</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="table-simulation" class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ville</th>
+                                <th>Article</th>
+                                <th class="text-end">Quantité</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-body">
+                            <!-- Rempli par AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+        background-color: #f8f9fa;
+        min-height: 400px;
+    }
+</style>
+
+<script>
+document.getElementById('btn-simuler').addEventListener('click', function() {
+    const btn = this;
+    const loading = document.getElementById('simulation-loading');
+    const placeholder = document.getElementById('simulation-placeholder');
+    const container = document.getElementById('simulation-container');
+    const resultBody = document.getElementById('result-body');
+
+    // UI Feedback
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Simulation...';
+    
+    placeholder.classList.add('d-none');
+    container.classList.add('d-none');
+    loading.classList.remove('d-none');
+
+    fetch('<?= BASE_URL ?>/distributions/simuler', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        resultBody.innerHTML = '';
+        
+        if (data.length === 0) {
+            resultBody.innerHTML = '<tr><td colspan="3" class="text-center py-3 text-muted">Aucune distribution n\'est nécessaire ou possible avec le stock actuel.</td></tr>';
+        } else {
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${item.ville_nom}</strong></td>
+                    <td>${item.article_nom}</td>
+                    <td class="text-end">
+                        <span class="badge bg-success">${item.quantite_attribuee.toLocaleString()}</span>
+                        <small class="text-muted">${item.unite}</small>
+                    </td>
+                `;
+                resultBody.appendChild(tr);
+            });
+        }
+
+        loading.classList.add('d-none');
+        container.classList.remove('d-none');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> Lancer la Simulation';
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de la simulation.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> Lancer la Simulation';
+    });
+});
+</script>
+
+<?php
+$content = ob_get_clean();
+include(__DIR__ . '/../layout/layout.php');
+?>

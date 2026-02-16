@@ -6,6 +6,7 @@ use app\controllers\DashboardController;
 use app\controllers\BesoinController;
 use app\controllers\ArticleController;
 use app\controllers\DonController;
+use app\controllers\DistributoinController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -88,10 +89,14 @@ $router->group('', function (Router $router) use ($app) {
 
     // Gestion des distributions
     $router->group('/distributions', function (Router $router) use ($app) {
-        $don_controller = new DonController();
+        $distrobutoinControleur = new DistributoinController();
 
         // Liste des distributions (avec filtre optionnel par ville)
-        $router->get('/', [$don_controller, 'distributions']);
+        $router->get('/', [$distrobutoinControleur, 'distributions']);
+        
+        // Simulateur de distribution
+        $router->get('/simulateur', [$distrobutoinControleur, 'Simulateur']);
+        $router->post('/simuler', [$distrobutoinControleur, 'Simulatoin_Distributoin']);
     });
 
 });
