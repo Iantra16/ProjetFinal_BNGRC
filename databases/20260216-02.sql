@@ -23,10 +23,7 @@ INSERT INTO region (nom) VALUES
 ('Vatovavy'),
 ('Vatovavy-Fitovinany'); 
 
-INSERT INTO type_besoin (nom) VALUES 
-('Alimentaire'),
-('Médical'),
-('Hébergement'),
-('Vêtements'),
-('Éducation'),
-('Autre');
+INSERT INTO type_besoin (libelle) VALUES 
+('Nature'),
+('Materiaux'),
+('Argent');

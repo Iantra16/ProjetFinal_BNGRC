@@ -4,6 +4,7 @@ use app\controllers\BngrcController;
 use app\controllers\VilleController;
 use app\controllers\DashboardController;
 use app\controllers\BesoinController;
+use app\controllers\ArticleController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -32,6 +33,18 @@ $router->group('', function (Router $router) use ($app) {
 
         // Ajouter un nouvel article (AJAX)
         $router->post('/article', [$besoin_controller, 'ajouterArticleAjax']);
+        
+    });
+
+    $router->group('/articles', function (Router $router) use ($app) {
+        $article_controller = new ArticleController();
+
+        // Formulaire d'ajout d'article
+        $router->get('/', [$article_controller, 'add']);
+
+        // Enregistrer un article
+        $router->post('/', [$article_controller, 'add']);
+
         
     });
     
