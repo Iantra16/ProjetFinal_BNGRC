@@ -26,4 +26,10 @@ class VilleController {
         Flight::render('ville/villes', ['villes' => $villes]);
     }
 
+    public function dashboard() {
+        $vM = new VilleModel(Flight::db());
+        $totalVilles = $vM->count();
+        Flight::render('dashboard', ['totalVilles' => $totalVilles]);
+    }
+
 }

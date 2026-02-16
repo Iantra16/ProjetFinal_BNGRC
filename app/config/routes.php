@@ -2,6 +2,7 @@
 
 use app\controllers\BngrcController;
 use app\controllers\VilleController;
+use app\controllers\DashboardController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -15,7 +16,7 @@ $router->group('', function (Router $router) use ($app) {
 
     // Page d'accueil - Tableau de bord
     $router->get('/', function () use ($app) {
-        $controller = new BngrcController();
+        $controller = new DashboardController();
         $controller->dashboard();
     });
 

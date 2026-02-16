@@ -49,4 +49,11 @@ class VilleModel
         return $sql->fetchAll();
     }
 
+    public function count() {
+        $sql = $this->db->prepare("SELECT COUNT(*) as total FROM ville");
+        $sql->execute();
+        $result = $sql->fetch(\PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+    }
+
 }

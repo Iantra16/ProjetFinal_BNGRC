@@ -218,12 +218,58 @@ class BngrcController
 
     public function distributions()
     {
+        $db = \Flight::db();
+        
+        // Récupérer toutes les distributions
+        $sql = $db->prepare(
+            "SELECT 
+                d.id,
+                d.quantite_attribuee,
+                d.date_distribution,
+                v.id AS ville_id,
+                v.nom AS ville_nom,
+                a.nom AS article_nom,
+                a.prix_unitaire,
+                a.unite,
+                (d.quantite_attribuee * a.prix_unitaire) AS valeur_totale,
+                don.donateur
+            FROM distribution d
+            JOIN besoin_article ba ON d.id_besoin_article = ba.id
+            JOIN besoin b ON ba.id_besoin = b.id
+            JOIN ville v ON b.id_ville = v.id
+            JOIN don_article da ON d.id_don_article = da.id
+            JOIN article a ON da.id_article = a.id
+            JOIN don ON da.id_don = don.id
+            ORDER BY d.date_distribution DESC"
+        );
+        $sql->execute();
+        $distributions = $sql->fetchAll(\PDO::FETCH_ASSOC);
+        
+        // Filtrer par ville si le paramètre est présent
+        $villeId = $_GET['ville'] ?? null;
+        $villeSelectionnee = null;
+        
+        if ($villeId) {
+            $distributions = array_filter($distributions, fn($d) => $d['ville_id'] == $villeId);
+            
+            // Récupérer les infos de la ville
+            $vM = new \app\models\VilleModel($db);
+            $villes = $vM->getAll();
+            foreach ($villes as $v) {
+                if ($v['id'] == $villeId) {
+                    $villeSelectionnee = $v;
+                    break;
+                }
+            }
+        }
+        
         \Flight::render('distribution/distributions', [
-            'title' => 'Simulation des Distributions',
-            'distributions' => $_SESSION['distributions'],
-            'besoins' => $_SESSION['besoins'],
-            'dons' => $_SESSION['dons'],
-            'villes' => self::$villes
+            'title' => 'Distributions' . ($villeSelectionnee ? ' - ' . $villeSelectionnee['nom'] : ''),
+            'distributions' => $distributions,
+            'besoins' => $_SESSION['besoins'] ?? [],
+            'dons' => $_SESSION['dons'] ?? [],
+            'villes' => self::$villes ?? [],
+            'villeSelectionnee' => $villeSelectionnee
         ]);
     }
 
