@@ -247,7 +247,7 @@ class BesoinModel
         return $sql->fetchAll();
     }
     function getReste_besoin_by_article($id_article) {
-        $sql = $this->db->prepare("select * from v_reste_besoin where id_article = ?");
+        $sql = $this->db->prepare("select * from v_reste_besoin where id_article = ? ORDER BY reste_a_combler ASC");
         $sql->execute([$id_article]);
         return $sql->fetchAll();
     }
