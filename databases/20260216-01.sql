@@ -41,20 +41,26 @@ CREATE TABLE besoin_article (
     quantite DECIMAL(12,2) NOT NULL
 );
 
--- Dons reçus
+-- Don recue
 CREATE TABLE don (
     id SERIAL PRIMARY KEY,
-    id_article INT REFERENCES article(id),
-    quantite DECIMAL(12,2) NOT NULL,
     donateur VARCHAR(200),
     date_don TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Distribution des dons
--- CREATE TABLE distribution (
---     id SERIAL PRIMARY KEY,
---     id_don INT REFERENCES don(id),
---     id_besoin_article INT REFERENCES besoin_article(id),  -- lié au besoin_article maintenant
---     quantite_attribuee DECIMAL(12,2) NOT NULL,
---     date_distribution TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+-- Articles dans un don
+CREATE TABLE don_article (
+    id SERIAL PRIMARY KEY,
+    id_don INT REFERENCES don(id),
+    id_article INT REFERENCES article(id),
+    quantite DECIMAL(12,2) NOT NULL
+);
+
+-- lie don_article à besoin_article
+CREATE TABLE distribution (
+    id SERIAL PRIMARY KEY,
+    id_don_article INT REFERENCES don_article(id),
+    id_besoin_article INT REFERENCES besoin_article(id),
+    quantite_attribuee DECIMAL(12,2) NOT NULL,
+    date_distribution TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
