@@ -13,7 +13,18 @@ class BesoinModel
         $this->db = $db;
     }
 
-    // ===================== BESOIN =====================
+
+    public function getAllTypeBesoin() {
+        $sql = $this->db->prepare("SELECT * FROM type_besoin");
+        $sql->execute();
+        return $sql->fetchAll();
+    }
+
+    public function getAllArticle(){
+        $sql = $this->db->prepare("SELECT a.*, t.libelle AS type_besoin FROM article a JOIN type_besoin t ON a.id_type_besoin = t.id");
+        $sql->execute();
+        return $sql->fetchAll();
+    }
 
     /**
      * Récupérer tous les besoins avec infos ville

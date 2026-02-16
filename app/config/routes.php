@@ -3,6 +3,7 @@
 use app\controllers\BngrcController;
 use app\controllers\VilleController;
 use app\controllers\DashboardController;
+use app\controllers\BesoinController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -20,22 +21,30 @@ $router->group('', function (Router $router) use ($app) {
         $controller->dashboard();
     });
 
-    // Gestion des besoins par ville
-    $router->get('/besoins', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->besoins();
-    });
+    $router->group('/besoins', function (Router $router) use ($app) {
+        $besoin_controller = new BesoinController();
 
-    // Ajouter un besoin
-    $router->get('/besoins/ajouter', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterBesoin();
+        // Formulaire d'ajout de besoin
+        $router->get('/', [$besoin_controller, 'ajouterForm']);
+        
     });
+    
+    // // Gestion des besoins par ville
+    // $router->get('/besoins', function () use ($app) {
+    //     $controller = new BngrcController();
+    //     $controller->besoins();
+    // });
 
-    $router->post('/besoins/ajouter', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterBesoin();
-    });
+    // // Ajouter un besoin
+    // $router->get('/besoins/ajouter', function () use ($app) {
+    //     $controller = new BngrcController();
+    //     $controller->ajouterBesoin();
+    // });
+
+    // $router->post('/besoins/ajouter', function () use ($app) {
+    //     $controller = new BngrcController();
+    //     $controller->ajouterBesoin();
+    // });
 
     // Gestion des dons
     $router->get('/dons', function () use ($app) {
@@ -65,33 +74,6 @@ $router->group('', function (Router $router) use ($app) {
         $controller->simulerDistributions();
     });
     
-    // $router->group('/user', function (Router $router) use ($app) {
-    //     $auth_controller = new AuthController();
-    //     $objet_controller = new ObjetController();
-    //     //login
-    //     $router->get('/login', function () use ($app) {
-    //         $app->render('front/login');
-    //     });
-    //     $router->post('/login',[$auth_controller,'loginUser']);
-
-    //     //inscription
-    //     $router->get('/inscription', function () use ($app) {
-    //         $app->render('front/inscription');
-    //     });
-    //     $router->post('/inscription',[$auth_controller,'registerUser']);
-
-    //     // accueil: liste objets
-    //     $router->get('/', [$objet_controller, 'findOtherObj']);
-    //     $router->get('/listobject', [$objet_controller, 'findOtherObj']);
-
-    //     // mes objets
-    //     $router->get('/myobject', [$objet_controller, 'showMyObjects']);
-    //     // Déconnexion
-    //     $router->get('/logout', function () use ($app) {
-    //         $auth_controller = new AuthController();
-    //         $auth_controller->logout();
-    //     });
-    // });
 
     // Gestion des villes
     $router->group('/villes', function (Router $router) use ($app) {
