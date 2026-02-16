@@ -1,3 +1,6 @@
+CREATE DATABASE bngrc;
+use bngrc;
+
 -- Types de besoins
 CREATE TABLE type_besoin (
     id SERIAL PRIMARY KEY,

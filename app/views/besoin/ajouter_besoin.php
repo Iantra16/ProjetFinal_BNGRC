@@ -1,3 +1,8 @@
+<?php
+$title = "Ajouter un besoin - BNGRC";
+ob_start();
+?>
+
 <div class="row">
     <div class="col-lg-8 mx-auto">
         <div class="card">
@@ -169,3 +174,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
+
+<?php
+$content = ob_get_clean();
+include(__DIR__ . '/../layout/layout.php');
+?>

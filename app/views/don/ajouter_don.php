@@ -3,6 +3,11 @@ $title = "Ajouter un don - BNGRC";
 ob_start();
 ?>
 
+<?php
+$title = "Ajouter un don - BNGRC";
+ob_start();
+?>
+
 <div class="page-header mb-4">
     <h1 class="page-title">
         <i class="fas fa-heart"></i>
@@ -240,5 +245,10 @@ donateurInput.addEventListener('input', function() {
 
 <?php
 $content = ob_get_clean();
-include 'layout.php';
+include(__DIR__ . '/../layout/layout.php');
+?>
+
+<?php
+$content = ob_get_clean();
+include '../layout/layout.php';
 ?>

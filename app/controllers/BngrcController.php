@@ -128,7 +128,7 @@ class BngrcController
 
     public function besoins()
     {
-        \Flight::render('besoins', [
+        \Flight::render('besoin/besoins', [
             'title' => 'Gestion des Besoins',
             'besoins' => $_SESSION['besoins'],
             'villes' => self::$villes,
@@ -154,7 +154,7 @@ class BngrcController
             return;
         }
 
-        \Flight::render('ajouter_besoin', [
+        \Flight::render('besoin/ajouter_besoin', [
             'title' => 'Ajouter un Besoin',
             'villes' => self::$villes,
             'categories' => self::$categories
@@ -163,7 +163,7 @@ class BngrcController
 
     public function dons()
     {
-        \Flight::render('dons', [
+        \Flight::render('don/dons', [
             'title' => 'Gestion des Dons',
             'dons' => $_SESSION['dons'],
             'categories' => self::$categories
@@ -189,7 +189,7 @@ class BngrcController
             return;
         }
 
-        \Flight::render('ajouter_don', [
+        \Flight::render('don/ajouter_don', [
             'title' => 'Ajouter un Don',
             'categories' => self::$categories
         ]);
@@ -197,7 +197,7 @@ class BngrcController
 
     public function distributions()
     {
-        \Flight::render('distributions', [
+        \Flight::render('distribution/distributions', [
             'title' => 'Simulation des Distributions',
             'distributions' => $_SESSION['distributions'],
             'besoins' => $_SESSION['besoins'],

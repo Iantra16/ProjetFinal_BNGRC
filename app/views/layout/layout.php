@@ -1,4 +1,4 @@
-<?php include("function.php"); ?>
+<?php include(__DIR__ . "/../function.php"); ?>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -21,7 +21,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-    <?php include("header.php"); ?>
+    <?php include(__DIR__ . "/header.php"); ?>
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <?php include("footer.php"); ?>
+    <?php include(__DIR__ . "/footer.php"); ?>
 </div>
 
 <!-- jQuery -->

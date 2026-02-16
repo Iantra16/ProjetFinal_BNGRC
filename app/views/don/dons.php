@@ -234,5 +234,5 @@ function formatMoney($amount) {
 
 <?php
 $content = ob_get_clean();
-include 'layout.php';
+include(__DIR__ . '/../layout/layout.php');
 ?>
