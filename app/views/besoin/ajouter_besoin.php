@@ -11,17 +11,25 @@ ob_start();
             </div>
             <div class="card-body">
                 <?php if (!empty($error)): ?>
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i>
                         <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
-                <form method="POST" id="formBesoin">
-                    <input type="hidden" name="id_article_nouveau" id="id_article_nouveau" value="">
-                    
+
+                <?php if (!empty($success)): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i>
+                        <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+                <form method="POST" action="/besoins" id="formBesoin">
                     <!-- 1. SÉLECTION VILLE -->
                     <div class="mb-3">
                         <label>🏙️ Ville *</label>
-                        <select name="id_ville" class="form-select" required>
+                        <select name="id_ville" id="id_ville" class="form-select" required>
                             <option value="">-- Sélectionner --</option>
                             <?php foreach ($villes as $v): ?>
                                 <option value="<?= $v['id'] ?>">
@@ -31,140 +39,73 @@ ob_start();
                         </select>
                     </div>
 
-                    <!-- 2. CHOIX MODE -->
+                    <!-- 2. SÉLECTION TYPE DE BESOIN -->
                     <div class="mb-4">
-                        <label>⚙️ Mode de Saisie *</label>
-                        <div class="btn-group w-100">
-                            <input type="radio" name="mode_article" id="mode_existant" value="existant" checked>
-                            <label for="mode_existant" class="btn btn-outline-primary">
-                                📦 Article Existant
-                            </label>
-                            
-                            <input type="radio" name="mode_article" id="mode_nouveau" value="nouveau">
-                            <label for="mode_nouveau" class="btn btn-outline-success">
-                                ➕ Nouvel Article
-                            </label>
-                        </div>
+                        <label>🏷️ Type de Besoin *</label>
+                        <select id="type_besoin_principal" name="type_besoin_principal" class="form-select" required>
+                            <option value="">-- Sélectionner --</option>
+                            <?php foreach ($types_besoin as $type): ?>
+                                <option value="<?= $type['id'] ?>" data-libelle="<?= htmlspecialchars($type['libelle']) ?>">
+                                    <?= $type['libelle'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
-                    <!-- 3a. SECTION ARTICLE EXISTANT -->
-                    <div id="section-existant">
-                        <div class="card border-primary mb-3">
-                            <div class="card-body">
-                                <!-- Filtre par type -->
-                                <div class="mb-3">
-                                    <label>🏷️ Type de Besoin</label>
-                                    <select id="type_besoin_filter" class="form-select">
-                                        <option value="">Tous</option>
-                                        <?php foreach ($types_besoin as $type): ?>
-                                            <option value="<?= $type['id'] ?>">
-                                                <?= $type['libelle'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                
-                                <!-- Sélection article -->
-                                <div class="mb-3">
-                                    <label>📦 Article *</label>
-                                    <select name="id_article_existant" id="article_existant" class="form-select">
-                                        <option value="">-- Sélectionner --</option>
-                                        <?php foreach ($articles as $art): ?>
-                                            <option value="<?= $art['id'] ?>"
-                                                    data-type="<?= $art['id_type_besoin'] ?>"
-                                                    data-prix="<?= $art['prix_unitaire'] ?>"
-                                                    data-unite="<?= $art['unite'] ?>">
-                                                <?= $art['nom'] ?> 
-                                                (<?= number_format($art['prix_unitaire']) ?> Ar/<?= $art['unite'] ?>)
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                    <!-- SECTION NATURE ET MATÉRIAUX -->
+                    <div id="section-nature-materiaux" class="d-none">
+                        <!-- 3. SÉLECTION ARTICLE -->
+                        <div class="mb-3">
+                            <label>📦 Article *</label>
+                            <select name="id_article_existant" id="article_existant" class="form-select" required>
+                                <option value="">-- Sélectionner un article --</option>
+                                <?php foreach ($articles as $art): ?>
+                                    <option value="<?= $art['id'] ?>"
+                                            data-type="<?= $art['id_type_besoin'] ?>"
+                                            data-prix="<?= $art['prix_unitaire'] ?>"
+                                            data-unite="<?= $art['unite'] ?>">
+                                        <?= $art['nom'] ?> 
+                                        (<?= number_format($art['prix_unitaire']) ?> Ar/<?= $art['unite'] ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- 4. QUANTITÉ -->
+                        <div class="mb-3">
+                            <label>🧮 Quantité Nécessaire *</label>
+                            <div class="input-group">
+                                <input type="number" name="quantite" id="quantite" class="form-control" step="0.01" min="0.01" required>
+                                <span class="input-group-text" id="unite-display">unité</span>
+                            </div>
+                        </div>
+
+                        <!-- 5. VALEUR ESTIMÉE -->
+                        <div class="mb-4">
+                            <label>💵 Valeur Estimée</label>
+                            <div class="input-group">
+                                <input type="text" id="valeur-estimee" name="valeur_estimee" class="form-control bg-light" readonly>
+                                <span class="input-group-text bg-success text-white">Ar</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3b. SECTION NOUVEL ARTICLE -->
-                    <div id="section-nouveau" class="d-none">
-                        <div class="card border-success mb-3">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label>🏷️ Nom de l'Article *</label>
-                                        <input type="text" name="nouveau_nom" id="nouveau_nom" class="form-control" placeholder="Ex: Riz local">
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label>📑 Type de Besoin *</label>
-                                        <select name="id_type_besoin_nouveau" id="nouveau_type" class="form-select">
-                                            <option value="">-- Sélectionner --</option>
-                                            <?php foreach ($types_besoin as $type): ?>
-                                                <option value="<?= $type['id'] ?>">
-                                                    <?= $type['libelle'] ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label>💰 Prix Unitaire (Ar) *</label>
-                                        <input type="number" name="nouveau_prix" id="nouveau_prix" class="form-control" step="0.01" min="0">
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label>📏 Unité *</label>
-                                        <input type="text" name="nouveau_unite" id="nouveau_unite" class="form-control" list="unites" placeholder="kg, L, pièce...">
-                                        <datalist id="unites">
-                                            <option value="kg">
-                                            <option value="L">
-                                            <option value="pièce">
-                                            <option value="sac">
-                                            <option value="tôle">
-                                            <option value="carton">
-                                            <option value="boite">
-                                        </datalist>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="button" id="btn-ajouter-article" class="btn btn-success">
-                                            OK - Ajouter l'article
-                                        </button>
-                                        <span id="article-status" class="ms-2 text-muted"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. QUANTITÉ -->
-                    <div class="mb-3">
-                        <label>🧮 Quantité Nécessaire *</label>
-                        <div class="input-group">
-                            <input type="number" name="quantite" id="quantite" class="form-control" step="0.01" min="0.01" required>
-                            <span class="input-group-text" id="unite-display">unité</span>
-                        </div>
-                    </div>
-
-                    <!-- 5. VALEUR ESTIMÉE -->
-                    <div class="mb-4">
-                        <label>💵 Valeur Estimée</label>
-                        <div class="input-group">
-                            <input type="text" id="valeur-estimee" class="form-control bg-light" readonly>
-                            <span class="input-group-text bg-success text-white">Ar</span>
+                    <!-- SECTION ARGENT -->
+                    <div id="section-argent" class="d-none">
+                        <div class="mb-4">
+                            <label>💰 Somme d'Argent Nécessaire (Ar) *</label>
+                            <input type="number" name="somme_argent" id="somme_argent" class="form-control" 
+                                   placeholder="Montant en Ariary" step="0.01" min="0">
+                            <div class="form-text">Veuillez entrer le montant en Ariary</div>
                         </div>
                     </div>
 
                     <!-- BOUTONS -->
                     <div class="row">
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary w-100">
+                            <button type="submit" id="btn-submit" class="btn btn-primary w-100" disabled>
                                 💾 Enregistrer
                             </button>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="/besoins" class="btn btn-secondary w-100">⬅️ Retour</a>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="reset" class="btn btn-outline-warning w-100">🔄 Reset</button>
                         </div>
                     </div>
                 </form>
@@ -178,9 +119,9 @@ ob_start();
             <div class="card-body">
                 <ol>
                     <li>Sélectionner la ville</li>
-                    <li>Choisir le mode (existant/nouveau)</li>
-                    <li>Indiquer la quantité</li>
-                    <li>Vérifier la valeur</li>
+                    <li>Choisir le type de besoin (Nature, Matériaux ou Argent)</li>
+                    <li>Pour Nature/Matériaux : choisir le mode et indiquer la quantité</li>
+                    <li>Pour Argent : entrer la somme</li>
                     <li>Enregistrer</li>
                 </ol>
             </div>
@@ -191,61 +132,74 @@ ob_start();
 <script>
 // JAVASCRIPT POUR LA GESTION DU FORMULAIRE
 document.addEventListener('DOMContentLoaded', function() {
-    const modeExistant = document.getElementById('mode_existant');
-    const modeNouveau = document.getElementById('mode_nouveau');
-    const sectionExistant = document.getElementById('section-existant');
-    const sectionNouveau = document.getElementById('section-nouveau');
+    // Éléments du DOM
+    const typeBesoinPrincipal = document.getElementById('type_besoin_principal');
+    const sectionNatureMateriaux = document.getElementById('section-nature-materiaux');
+    const sectionArgent = document.getElementById('section-argent');
     const articleExistant = document.getElementById('article_existant');
-    const typeFilter = document.getElementById('type_besoin_filter');
     const quantite = document.getElementById('quantite');
     const uniteDisplay = document.getElementById('unite-display');
     const valeurEstimee = document.getElementById('valeur-estimee');
-    const nouveauPrix = document.getElementById('nouveau_prix');
-    const nouveauUnite = document.getElementById('nouveau_unite');
-    const nouveauNom = document.getElementById('nouveau_nom');
-    const nouveauType = document.getElementById('nouveau_type');
-    const btnAjouterArticle = document.getElementById('btn-ajouter-article');
-    const articleStatus = document.getElementById('article-status');
-    const idArticleNouveau = document.getElementById('id_article_nouveau');
+    const sommeArgent = document.getElementById('somme_argent');
+    const btnSubmit = document.getElementById('btn-submit');
     const allArticleOptions = Array.from(articleExistant.options);
     
     let prixUnitaire = 0;
+    let typeBesoinSelectedId = '';
     
-    // Basculer entre les modes
-    modeExistant.addEventListener('change', () => {
-        sectionExistant.classList.remove('d-none');
-        sectionNouveau.classList.add('d-none');
-        articleExistant.required = true;
-        nouveauNom.required = false;
-        nouveauType.required = false;
-        nouveauPrix.required = false;
-        nouveauUnite.required = false;
+    // Gestion du changement de type de besoin
+    typeBesoinPrincipal.addEventListener('change', function() {
+        typeBesoinSelectedId = this.value;
+        const libelle = this.options[this.selectedIndex].dataset.libelle || '';
+        
+        if (!typeBesoinSelectedId) {
+            sectionNatureMateriaux.classList.add('d-none');
+            sectionArgent.classList.add('d-none');
+            btnSubmit.disabled = true;
+            return;
+        }
+        
+        // Afficher la section appropriée
+        if (libelle === 'Argent') {
+            sectionNatureMateriaux.classList.add('d-none');
+            sectionArgent.classList.remove('d-none');
+            quantite.removeAttribute('required');
+            sommeArgent.setAttribute('required', 'required');
+            btnSubmit.disabled = false;
+        } else if (libelle === 'Nature' || libelle === 'Materiaux') {
+            sectionNatureMateriaux.classList.remove('d-none');
+            sectionArgent.classList.add('d-none');
+            sommeArgent.removeAttribute('required');
+            quantite.setAttribute('required', 'required');
+            // Filtrer les articles par type sélectionné
+            filterArticlesByType();
+            btnSubmit.disabled = false;
+        } else {
+            sectionNatureMateriaux.classList.add('d-none');
+            sectionArgent.classList.add('d-none');
+            btnSubmit.disabled = true;
+        }
     });
     
-    modeNouveau.addEventListener('change', () => {
-        sectionNouveau.classList.remove('d-none');
-        sectionExistant.classList.add('d-none');
-        articleExistant.required = false;
-        nouveauNom.required = true;
-        nouveauType.required = true;
-        nouveauPrix.required = true;
-        nouveauUnite.required = true;
-    });
-    
-    // Filtrer les articles par type
-    typeFilter.addEventListener('change', function() {
-        const typeId = this.value;
+    // Filtrer les articles par type sélectionné
+    function filterArticlesByType() {
         articleExistant.innerHTML = '';
+        const firstOption = allArticleOptions.find(opt => opt.value === '');
+        if (firstOption) {
+            articleExistant.appendChild(firstOption.cloneNode(true));
+        }
+        
         allArticleOptions.forEach(option => {
-            if (option.value === '' || !typeId || option.dataset.type === typeId) {
-                articleExistant.appendChild(option);
+            if (option.value && option.dataset.type === typeBesoinSelectedId) {
+                articleExistant.appendChild(option.cloneNode(true));
             }
         });
+        
         articleExistant.value = '';
         prixUnitaire = 0;
         uniteDisplay.textContent = 'unité';
         valeurEstimee.value = '';
-    });
+    }
     
     // Sélection article existant
     articleExistant.addEventListener('change', function() {
@@ -261,19 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Nouvel article: prix
-    nouveauPrix.addEventListener('input', function() {
-        prixUnitaire = parseFloat(this.value) || 0;
-        calculer();
-    });
-    
-    // Nouvel article: unité
-    nouveauUnite.addEventListener('input', function() {
-        if (this.value) {
-            uniteDisplay.textContent = this.value;
-        }
-    });
-    
     // Calcul quantité
     quantite.addEventListener('input', calculer);
     
@@ -286,66 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
             valeurEstimee.value = '';
         }
     }
-
-    // Ajouter un nouvel article via AJAX
-    btnAjouterArticle.addEventListener('click', async () => {
-        articleStatus.textContent = '';
-
-        const nom = nouveauNom.value.trim();
-        const idTypeBesoin = nouveauType.value;
-        const prix = nouveauPrix.value;
-        const unite = nouveauUnite.value.trim();
-
-        if (!nom || !idTypeBesoin || !prix || !unite) {
-            articleStatus.textContent = "Veuillez remplir tous les champs du nouvel article.";
-            articleStatus.classList.remove('text-success');
-            articleStatus.classList.add('text-danger');
-            return;
-        }
-
-        try {
-            const body = new URLSearchParams({
-                nom,
-                id_type_besoin: idTypeBesoin,
-                prix_unitaire: prix,
-                unite
-            });
-
-            const response = await fetch('/besoins/article', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Erreur lors de l\'ajout de l\'article.');
-            }
-
-            const option = document.createElement('option');
-            option.value = data.article.id;
-            option.dataset.type = data.article.id_type_besoin;
-            option.dataset.prix = data.article.prix_unitaire;
-            option.dataset.unite = data.article.unite;
-            option.textContent = `${data.article.nom} (${new Intl.NumberFormat('fr-FR').format(Math.round(data.article.prix_unitaire))} Ar/${data.article.unite})`;
-            articleExistant.appendChild(option);
-            articleExistant.value = data.article.id;
-
-            idArticleNouveau.value = data.article.id;
-            prixUnitaire = parseFloat(data.article.prix_unitaire) || 0;
-            uniteDisplay.textContent = data.article.unite;
-            calculer();
-
-            articleStatus.textContent = "Article ajoute avec succes.";
-            articleStatus.classList.remove('text-danger');
-            articleStatus.classList.add('text-success');
-        } catch (error) {
-            articleStatus.textContent = error.message;
-            articleStatus.classList.remove('text-success');
-            articleStatus.classList.add('text-danger');
-        }
-    });
 });
 </script>
 

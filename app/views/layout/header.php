@@ -12,6 +12,11 @@
 
             <ul class="navbar-nav ms-auto bngrc-nav">
                 <li class="nav-item">
+                    <a href="/articles" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/articles') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-boxes"></i> Articles
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
                         <i class="fas fa-list-ul"></i> Besoins
                     </a>
