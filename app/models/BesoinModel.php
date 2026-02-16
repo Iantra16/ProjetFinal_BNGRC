@@ -240,4 +240,17 @@ class BesoinModel
 
         return $result['total'] ?? 0;
     }
+
+    function getReste_besoin() {
+        $sql = $this->db->prepare("select * from v_reste_besoin");
+        $sql->execute();
+        return $sql->fetchAll();
+    }
+    function getReste_besoin_by_article($id_article) {
+        $sql = $this->db->prepare("select * from v_reste_besoin where id_article = ?");
+        $sql->execute([$id_article]);
+        return $sql->fetchAll();
+    }
+
+
 }
