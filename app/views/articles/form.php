@@ -36,7 +36,7 @@ ob_start();
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="/articles" id="formArticle">
+                <form method="POST" action="/articles/ajouter" id="formArticle">
                     <!-- Nom de l'article -->
                     <div class="mb-3">
                         <label for="nom" class="form-label">

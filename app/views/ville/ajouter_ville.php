@@ -114,7 +114,31 @@ ob_start();
     </section>
 </div>
 
-
+<script>
+// Désactiver l'autre champ quand l'un est rempli
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.getElementById('region');
+    const nouvelleRegionInput = document.getElementById('nouvelle_region');
+    
+    regionSelect.addEventListener('change', function() {
+        if (this.value) {
+            nouvelleRegionInput.value = '';
+            nouvelleRegionInput.setAttribute('disabled', true);
+        } else {
+            nouvelleRegionInput.removeAttribute('disabled');
+        }
+    });
+    
+    nouvelleRegionInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+            regionSelect.value = '';
+            regionSelect.setAttribute('disabled', true);
+        } else {
+            regionSelect.removeAttribute('disabled');
+        }
+    });
+});
+</script>
 
 <?php
 $content = ob_get_clean();
