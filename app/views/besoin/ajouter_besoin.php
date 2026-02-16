@@ -57,7 +57,7 @@ ob_start();
                         <!-- 3. SÉLECTION ARTICLE -->
                         <div class="mb-3">
                             <label>📦 Article *</label>
-                            <select name="id_article_existant" id="article_existant" class="form-select" required>
+                            <select name="id_article_existant" id="article_existant" class="form-select">
                                 <option value="">-- Sélectionner un article --</option>
                                 <?php foreach ($articles as $art): ?>
                                     <option value="<?= $art['id'] ?>"
@@ -75,7 +75,7 @@ ob_start();
                         <div class="mb-3">
                             <label>🧮 Quantité Nécessaire *</label>
                             <div class="input-group">
-                                <input type="number" name="quantite" id="quantite" class="form-control" step="0.01" min="0.01" required>
+                                <input type="number" name="quantite" id="quantite" class="form-control" step="0.01" min="0.01">
                                 <span class="input-group-text" id="unite-display">unité</span>
                             </div>
                         </div>
@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sectionNatureMateriaux.classList.add('d-none');
             sectionArgent.classList.remove('d-none');
             quantite.removeAttribute('required');
+            articleExistant.removeAttribute('required');
             sommeArgent.setAttribute('required', 'required');
             btnSubmit.disabled = false;
         } else if (libelle === 'Nature' || libelle === 'Materiaux') {
@@ -171,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sectionArgent.classList.add('d-none');
             sommeArgent.removeAttribute('required');
             quantite.setAttribute('required', 'required');
+            articleExistant.setAttribute('required', 'required');
             // Filtrer les articles par type sélectionné
             filterArticlesByType();
             btnSubmit.disabled = false;

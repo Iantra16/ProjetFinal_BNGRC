@@ -97,6 +97,7 @@ class BesoinController
                 // Création automatique de l'article Argent
                 $idArticle = $besoinModel->createArticle('Argent', $idTypeBesoin, 1, 'Ar');
             }
+            // Pour argent, la quantité est toujours 1 (on stocke le montant en quantité)
             $quantite = $montant;
 
         }
