@@ -60,3 +60,24 @@ JOIN article a ON ba.id_article = a.id
 -- Filtre pour ne garder que les besoins non terminés
 HAVING reste_a_combler > 0;
 
+CREATE OR REPLACE VIEW v_historique_distributions_villes AS
+SELECT 
+    dist.id AS distribution_id,
+    dist.quantite_attribuee,
+    dist.date_distribution,
+    v.id AS ville_id,
+    v.nom AS ville_nom,
+    a.nom AS article_nom,
+    a.prix_unitaire,
+    a.unite,
+    don.donateur,
+    -- Calcul de la valeur financière de cette distribution précise
+    (dist.quantite_attribuee * a.prix_unitaire) AS valeur_totale
+FROM distribution dist
+JOIN besoin_article ba ON dist.id_besoin_article = ba.id
+JOIN besoin b ON ba.id_besoin = b.id
+JOIN ville v ON b.id_ville = v.id
+JOIN don_article da ON dist.id_don_article = da.id
+JOIN article a ON da.id_article = a.id
+JOIN don ON da.id_don = don.id
+ORDER BY dist.date_distribution DESC;

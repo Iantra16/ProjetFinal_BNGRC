@@ -246,4 +246,11 @@ class DonModel
         $sql->execute();
         return $sql->fetchAll();
     }
+
+    public function Get_Reste_dons_disponibles() {
+        $sql = "SELECT * FROM v_reste_dons_disponibles";
+        $sql = $this->db->prepare($sql);
+        $sql->execute();
+        return $sql->fetchAll();
+    }
 }

@@ -32,8 +32,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/distributions" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/distributions') !== false ? ' active' : '' ?>">
+                    <a href="/distributions" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/distributions') !== false && strpos($_SERVER['REQUEST_URI'], '/simulateur') === false ? ' active' : '' ?>">
                         <i class="fas fa-truck"></i> Distributions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/distributions/simulateur" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/simulateur') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-magic"></i> Simulateur
                     </a>
                 </li>
             </ul>
