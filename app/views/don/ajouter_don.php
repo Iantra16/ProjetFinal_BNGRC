@@ -247,8 +247,3 @@ donateurInput.addEventListener('input', function() {
 $content = ob_get_clean();
 include(__DIR__ . '/../layout/layout.php');
 ?>
-
-<?php
-$content = ob_get_clean();
-include '../layout/layout.php';
-?>

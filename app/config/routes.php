@@ -1,6 +1,7 @@
 <?php
 
 use app\controllers\BngrcController;
+use app\controllers\VilleController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -61,6 +62,72 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/distributions/simuler', function () use ($app) {
         $controller = new BngrcController();
         $controller->simulerDistributions();
+    });
+    
+    // $router->group('/user', function (Router $router) use ($app) {
+    //     $auth_controller = new AuthController();
+    //     $objet_controller = new ObjetController();
+    //     //login
+    //     $router->get('/login', function () use ($app) {
+    //         $app->render('front/login');
+    //     });
+    //     $router->post('/login',[$auth_controller,'loginUser']);
+
+    //     //inscription
+    //     $router->get('/inscription', function () use ($app) {
+    //         $app->render('front/inscription');
+    //     });
+    //     $router->post('/inscription',[$auth_controller,'registerUser']);
+
+    //     // accueil: liste objets
+    //     $router->get('/', [$objet_controller, 'findOtherObj']);
+    //     $router->get('/listobject', [$objet_controller, 'findOtherObj']);
+
+    //     // mes objets
+    //     $router->get('/myobject', [$objet_controller, 'showMyObjects']);
+    //     // Déconnexion
+    //     $router->get('/logout', function () use ($app) {
+    //         $auth_controller = new AuthController();
+    //         $auth_controller->logout();
+    //     });
+    // });
+
+    // Gestion des villes
+    $router->group('/villes', function (Router $router) use ($app) {
+        $ville_controller = new VilleController();
+
+        // Liste des villes
+        $router->get('/', [$ville_controller, 'list']);
+
+        // Formulaire d'ajout de ville
+        $router->get('/ajouter', [$ville_controller, 'add']);
+
+        // Traitement de l'ajout de ville
+        $router->post('/ajouter', [$ville_controller, 'add']);
+    });
+
+    // Sélectionner une ville pour gérer ses besoins
+    $router->get('/villes/besoins', function () use ($app) {
+        $controller = new BngrcController();
+        $controller->besoinVille();
+    });
+
+    // Afficher les besoins d'une ville spécifique
+    $router->get('/villes/@id:[0-9]+/besoins', function ($id) use ($app) {
+        $controller = new BngrcController();
+        $controller->besoinVille($id);
+    });
+
+    // Formulaire d'ajout de besoin pour une ville spécifique
+    $router->get('/villes/@id:[0-9]+/besoins/ajouter', function ($id) use ($app) {
+        $controller = new BngrcController();
+        $controller->ajouterBesoinVille($id);
+    });
+
+    // Traitement de l'ajout de besoin pour une ville spécifique
+    $router->post('/villes/@id:[0-9]+/besoins/ajouter', function ($id) use ($app) {
+        $controller = new BngrcController();
+        $controller->ajouterBesoinVille($id);
     });
 
 });

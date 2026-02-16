@@ -22,6 +22,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/villes" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/villes') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-city"></i> Villes
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/dons" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/dons') !== false ? ' active' : '' ?>">
                         <i class="fas fa-gift"></i> Dons
                     </a>
