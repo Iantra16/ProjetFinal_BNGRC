@@ -20,13 +20,13 @@ class VilleModel
     }
 
     public function getAll(){
-        $sql = $this->db->prepare("SELECT * FROM ville");
+        $sql = $this->db->prepare("SELECT v.id, v.nom, v.id_region, COALESCE(r.nom, 'Non assignée') as region_nom FROM ville v LEFT JOIN region r ON v.id_region = r.id ORDER BY v.id DESC");
         $sql->execute();
-        return $sql->fetchAll();
+        return $sql->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getVilleById($idVille) {
-        $sql = $this->db->prepare("SELECT * FROM ville WHERE idVille = ?");
+        $sql = $this->db->prepare("SELECT v.id, v.nom, v.id_region, r.nom as region_nom FROM ville v LEFT JOIN region r ON v.id_region = r.id WHERE v.idVille = ?");
         $sql->execute([$idVille]);
         return $sql->fetch();
     }
@@ -42,4 +42,18 @@ class VilleModel
         $req = $sql->execute([$id]);
         return $req;
     }
+
+    public function getRegions() {
+        $sql = $this->db->prepare("SELECT * FROM region");
+        $sql->execute();
+        return $sql->fetchAll();
+    }
+
+    public function count() {
+        $sql = $this->db->prepare("SELECT COUNT(*) as total FROM ville");
+        $sql->execute();
+        $result = $sql->fetch(\PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+    }
+
 }

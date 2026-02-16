@@ -497,3 +497,447 @@ body {
     background: linear-gradient(135deg, var(--info-color) 0%, #138496 100%);
     color: white;
 }
+
+/* === STYLES POUR LA GESTION DES VILLES === */
+
+/* Cards pour les villes */
+.ville-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.ville-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.ville-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-bottom: none;
+    font-weight: 600;
+}
+
+.ville-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Badges pour les régions */
+.badge-region {
+    background: linear-gradient(135deg, var(--info-color) 0%, #138496 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Statistiques par région */
+.region-stats {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: var(--transition);
+}
+
+.region-stats:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.region-stats .info-box-icon {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Formulaire d'ajout de ville */
+.form-ville {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.form-ville .form-group label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.form-ville .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+.form-ville .form-control:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Sélection de ville */
+.ville-selection-card {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: var(--transition);
+    background: white;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+.ville-selection-card:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+}
+
+.ville-selection-card .card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.ville-selection-card .btn-group-vertical .btn {
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: var(--transition);
+}
+
+.ville-selection-card .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+}
+
+.ville-selection-card .btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+    border: none;
+}
+
+/* Besoins par ville */
+.besoin-ville-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px 15px 0 0;
+    margin-bottom: 2rem;
+}
+
+.besoin-ville-header h1 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.besoin-ville-header .breadcrumb {
+    background: transparent;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+}
+
+.besoin-ville-header .breadcrumb-item a {
+    color: rgba(255,255,255,0.8);
+}
+
+.besoin-ville-header .breadcrumb-item.active {
+    color: white;
+}
+
+/* Statistiques de ville */
+.ville-stats .info-box {
+    border-radius: 12px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    transition: var(--transition);
+}
+
+.ville-stats .info-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+}
+
+.ville-stats .info-box-icon {
+    width: 80px;
+    border-radius: 12px 0 0 12px;
+}
+
+/* Table des besoins */
+.besoins-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+.besoins-table .table {
+    margin: 0;
+}
+
+.besoins-table .table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    font-weight: 600;
+    color: var(--primary-color);
+    padding: 1rem;
+}
+
+.besoins-table .table tbody td {
+    border-color: #f1f3f4;
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.besoins-table .table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Résumé par catégorie */
+.resume-categorie .small-box {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    transition: var(--transition);
+}
+
+.resume-categorie .small-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+}
+
+/* Formulaire d'ajout de besoin */
+.form-besoin {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.form-besoin .card-header {
+    background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    font-weight: 600;
+}
+
+.form-besoin .form-control-plaintext {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.form-besoin .input-group-text {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    border: 2px solid #e9ecef;
+    font-weight: 600;
+}
+
+/* Card d'aide */
+.aide-card {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    border: none;
+    border-radius: 12px;
+    color: #2d3436;
+}
+
+.aide-card .card-header {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    font-weight: 700;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Actions rapides */
+.actions-rapides .btn {
+    border-radius: 10px;
+    padding: 15px 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+    border: none;
+}
+
+.actions-rapides .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Responsive pour les villes */
+@media (max-width: 768px) {
+    .ville-selection-card .btn-group-vertical .btn {
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+    
+    .besoin-ville-header {
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .form-ville, .form-besoin {
+        padding: 1rem;
+    }
+    
+    .ville-stats .info-box-icon {
+        width: 60px;
+    }
+}
+
+/* États des boutons avec icônes */
+.btn-avec-icone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-avec-icone i {
+    font-size: 1.1em;
+}
+
+/* Effet de survol pour les badges */
+.badge-interactive {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.badge-interactive:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===================== Styles pour les cards du dashboard ===================== */
+
+/* Card ville dans le dashboard */
+.card.h-100 {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card.h-100:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Icônes dans les cards */
+.card-body .fa-city {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.card:hover .fa-city {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Titres des cards */
+.card-title {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Badges dans les cards */
+.card .badge {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Footer des cards */
+.card-footer {
+    border-top: 2px solid #dee2e6;
+    padding: 1rem;
+}
+
+.card-footer .btn {
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.card-footer .btn:hover {
+    transform: translateX(5px);
+}
+
+/* Progress bar dans les cards */
+.card .progress {
+    border-radius: 10px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card .progress-bar {
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: width 0.6s ease;
+}
+
+/* Statistiques dans les cards */
+.card-body .border-end {
+    border-right: 2px solid #dee2e6 !important;
+}
+
+.card-body h5 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.card-body small {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Animation au chargement */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card.h-100 {
+    animation: fadeInUp 0.5s ease;
+}
+
+/* Responsive pour les cards */
+@media (max-width: 768px) {
+    .card.h-100 {
+        margin-bottom: 1rem;
+    }
+    
+    .card-body .fa-city {
+        font-size: 2rem !important;
+    }
+}

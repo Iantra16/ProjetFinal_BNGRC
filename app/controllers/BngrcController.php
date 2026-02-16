@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use Flight;
+
 class BngrcController
 {
     private static $villes = [
@@ -37,6 +39,19 @@ class BngrcController
 
     public function __construct()
     {
+        $this->initializeData();
+    }
+
+    private function initializeData()
+    {
+        // Initialiser les villes si nécessaire
+        if (!isset($_SESSION['villes'])) {
+            $_SESSION['villes'] = self::$villes;
+        } else {
+            // Synchroniser avec les données de session
+            self::$villes = $_SESSION['villes'];
+        }
+        
         // Initialiser les données de session si nécessaire
         if (!isset($_SESSION['besoins'])) {
             $_SESSION['besoins'] = [
@@ -114,6 +129,9 @@ class BngrcController
 
     public function dashboard()
     {
+        // S'assurer que les données sont initialisées
+        $this->initializeData();
+        
         $data = $this->preparerDonneesDashboard();
         
         \Flight::render('dashboard', [
@@ -128,6 +146,9 @@ class BngrcController
 
     public function besoins()
     {
+        // S'assurer que les données sont initialisées
+        $this->initializeData();
+        
         \Flight::render('besoin/besoins', [
             'title' => 'Gestion des Besoins',
             'besoins' => $_SESSION['besoins'],
@@ -197,12 +218,58 @@ class BngrcController
 
     public function distributions()
     {
+        $db = \Flight::db();
+        
+        // Récupérer toutes les distributions
+        $sql = $db->prepare(
+            "SELECT 
+                d.id,
+                d.quantite_attribuee,
+                d.date_distribution,
+                v.id AS ville_id,
+                v.nom AS ville_nom,
+                a.nom AS article_nom,
+                a.prix_unitaire,
+                a.unite,
+                (d.quantite_attribuee * a.prix_unitaire) AS valeur_totale,
+                don.donateur
+            FROM distribution d
+            JOIN besoin_article ba ON d.id_besoin_article = ba.id
+            JOIN besoin b ON ba.id_besoin = b.id
+            JOIN ville v ON b.id_ville = v.id
+            JOIN don_article da ON d.id_don_article = da.id
+            JOIN article a ON da.id_article = a.id
+            JOIN don ON da.id_don = don.id
+            ORDER BY d.date_distribution DESC"
+        );
+        $sql->execute();
+        $distributions = $sql->fetchAll(\PDO::FETCH_ASSOC);
+        
+        // Filtrer par ville si le paramètre est présent
+        $villeId = $_GET['ville'] ?? null;
+        $villeSelectionnee = null;
+        
+        if ($villeId) {
+            $distributions = array_filter($distributions, fn($d) => $d['ville_id'] == $villeId);
+            
+            // Récupérer les infos de la ville
+            $vM = new \app\models\VilleModel($db);
+            $villes = $vM->getAll();
+            foreach ($villes as $v) {
+                if ($v['id'] == $villeId) {
+                    $villeSelectionnee = $v;
+                    break;
+                }
+            }
+        }
+        
         \Flight::render('distribution/distributions', [
-            'title' => 'Simulation des Distributions',
-            'distributions' => $_SESSION['distributions'],
-            'besoins' => $_SESSION['besoins'],
-            'dons' => $_SESSION['dons'],
-            'villes' => self::$villes
+            'title' => 'Distributions' . ($villeSelectionnee ? ' - ' . $villeSelectionnee['nom'] : ''),
+            'distributions' => $distributions,
+            'besoins' => $_SESSION['besoins'] ?? [],
+            'dons' => $_SESSION['dons'] ?? [],
+            'villes' => self::$villes ?? [],
+            'villeSelectionnee' => $villeSelectionnee
         ]);
     }
 
@@ -311,5 +378,214 @@ class BngrcController
             }
         }
         return 'Ville inconnue';
+    }
+
+    // === GESTION DES VILLES ===
+
+    /**
+     * Afficher la liste des villes
+     */
+    public function villes()
+    {
+        $villes = self::$villes;
+        
+        Flight::render('ville/villes', [
+            'villes' => $villes,
+            'title' => 'Gestion des Villes'
+        ]);
+    }
+
+    /**
+     * Formulaire d'ajout de ville
+     */
+    public function ajouterVille()
+    {
+        // Récupérer les régions disponibles (unique)
+        $regions = [];
+        foreach (self::$villes as $ville) {
+            if (!in_array($ville['region'], $regions)) {
+                $regions[] = $ville['region'];
+            }
+        }
+        
+        Flight::render('ville/ajouter_ville', [
+            'regions' => $regions,
+            'title' => 'Ajouter une Ville'
+        ]);
+    }
+
+    /**
+     * Traitement de l'ajout de ville
+     */
+    public function ajouterVillePost()
+    {
+        $nom = $_POST['nom'] ?? '';
+        $region = $_POST['region'] ?? '';
+        $nouvelleRegion = $_POST['nouvelle_region'] ?? '';
+        
+        if (empty($nom)) {
+            $error = "Le nom de la ville est obligatoire.";
+        } else {
+            // Utiliser nouvelle région si fournie, sinon région existante
+            $regionFinale = !empty($nouvelleRegion) ? $nouvelleRegion : $region;
+            
+            if (empty($regionFinale)) {
+                $error = "La région est obligatoire.";
+            } else {
+                // Générer nouvel ID
+                $nouvelId = max(array_column(self::$villes, 'id')) + 1;
+                
+                // Ajouter la ville
+                $nouvelleVille = [
+                    'id' => $nouvelId,
+                    'nom' => $nom,
+                    'region' => $regionFinale
+                ];
+                
+                self::$villes[] = $nouvelleVille;
+                
+                // Dans un vrai projet, sauvegarder en base
+                // Pour la démo, on stocke en session
+                $_SESSION['villes'] = self::$villes;
+                
+                $success = "Ville ajoutée avec succès !";
+            }
+        }
+        
+        // Récupérer les régions pour le formulaire
+        $regions = [];
+        foreach (self::$villes as $ville) {
+            if (!in_array($ville['region'], $regions)) {
+                $regions[] = $ville['region'];
+            }
+        }
+        
+        Flight::render('ajouter_ville', [
+            'regions' => $regions,
+            'title' => 'Ajouter une Ville',
+            'error' => $error ?? null,
+            'success' => $success ?? null,
+            'nom' => $nom,
+            'region' => $region
+        ]);
+    }
+
+    /**
+     * Formulaire de gestion des besoins par ville
+     */
+    public function besoinVille($villeId = null)
+    {
+        if ($villeId === null) {
+            // Afficher la liste des villes pour sélection
+            Flight::render('besoin/selectionner_ville_besoin', [
+                'villes' => self::$villes,
+                'title' => 'Sélectionner une Ville'
+            ]);
+            return;
+        }
+        
+        // Trouver la ville
+        $ville = null;
+        foreach (self::$villes as $v) {
+            if ($v['id'] == $villeId) {
+                $ville = $v;
+                break;
+            }
+        }
+        
+        if (!$ville) {
+            Flight::redirect('/villes');
+            return;
+        }
+        
+        // Récupérer les besoins de cette ville
+        $besoinsVille = [];
+        foreach ($_SESSION['besoins'] ?? [] as $besoin) {
+            if ($besoin['ville_id'] == $villeId) {
+                $besoinsVille[] = $besoin;
+            }
+        }
+        
+        Flight::render('ville/besoin_ville', [
+            'ville' => $ville,
+            'besoins' => $besoinsVille,
+            'categories' => self::$categories,
+            'title' => 'Besoins de ' . $ville['nom']
+        ]);
+    }
+
+    /**
+     * Ajouter un besoin pour une ville spécifique
+     */
+    public function ajouterBesoinVille($villeId)
+    {
+        // Trouver la ville
+        $ville = null;
+        foreach (self::$villes as $v) {
+            if ($v['id'] == $villeId) {
+                $ville = $v;
+                break;
+            }
+        }
+        
+        if (!$ville) {
+            Flight::redirect('/villes');
+            return;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $categorie = $_POST['categorie'] ?? '';
+            $article = $_POST['article'] ?? '';
+            $quantite = $_POST['quantite'] ?? '';
+            
+            if (empty($categorie) || empty($article) || empty($quantite)) {
+                $error = "Tous les champs sont obligatoires.";
+            } elseif (!is_numeric($quantite) || $quantite <= 0) {
+                $error = "La quantité doit être un nombre positif.";
+            } else {
+                // Générer nouvel ID
+                $besoins = $_SESSION['besoins'] ?? [];
+                $nouvelId = empty($besoins) ? 1 : max(array_column($besoins, 'id')) + 1;
+                
+                // Trouver les détails de l'article
+                $detailsArticle = null;
+                foreach (self::$categories as $cat) {
+                    if ($cat['id'] == $categorie) {
+                        foreach ($cat['items'] as $item) {
+                            if ($item['nom'] === $article) {
+                                $detailsArticle = $item;
+                                break 2;
+                            }
+                        }
+                    }
+                }
+                
+                if ($detailsArticle) {
+                    // Ajouter le besoin
+                    $nouveauBesoin = [
+                        'id' => $nouvelId,
+                        'ville_id' => $villeId,
+                        'categorie_id' => $categorie,
+                        'article' => $article,
+                        'quantite' => $quantite,
+                        'unite' => $detailsArticle['unite'],
+                        'prix_unitaire' => $detailsArticle['prix_unitaire'],
+                        'date_ajout' => date('Y-m-d H:i:s')
+                    ];
+                    
+                    $_SESSION['besoins'][] = $nouveauBesoin;
+                    
+                    Flight::redirect('/villes/' . $villeId . '/besoins');
+                    return;
+                }
+            }
+        }
+        
+        Flight::render('besoin/ajouter_besoin_ville', [
+            'ville' => $ville,
+            'categories' => self::$categories,
+            'title' => 'Ajouter un Besoin - ' . $ville['nom'],
+            'error' => $error ?? null
+        ]);
     }
 }

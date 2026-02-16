@@ -24,11 +24,11 @@ ob_start();
             <div class="card-body">
                 <form action="/besoins/ajouter" method="POST">
                     <div class="mb-3">
-                        <label for="ville" class="form-label">Ville</label>
-                        <select class="form-select" id="ville" name="ville" required>
+                        <label for="ville_id" class="form-label">Ville</label>
+                        <select class="form-select" id="ville_id" name="ville_id" required>
                             <option value="">Sélectionner une ville...</option>
                             <?php foreach ($villes as $ville): ?>
-                                <option value="<?= htmlspecialchars($ville['nom']) ?>">
+                                <option value="<?= $ville['id'] ?>">
                                     <?= htmlspecialchars($ville['nom']) ?> - <?= htmlspecialchars($ville['region']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -36,19 +36,9 @@ ob_start();
                     </div>
                     
                     <div class="mb-3">
-                        <label for="type" class="form-label">Type de besoin</label>
-                        <select class="form-select" id="type" name="type" required>
-                            <option value="">Sélectionner un type...</option>
-                            <option value="nature">En nature (riz, huile, ...)</option>
-                            <option value="materiaux">Matériaux (tôle, clou, ...)</option>
-                            <option value="argent">Argent</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="description" name="description" 
-                               placeholder="Ex: Riz blanc, Tôles ondulées..." required>
+                        <label for="item" class="form-label">Article demandé</label>
+                        <input type="text" class="form-control" id="item" name="item" 
+                               placeholder="Ex: Riz, Tôles ondulées, Ciment..." required>
                     </div>
                     
                     <div class="row">
@@ -61,26 +51,11 @@ ob_start();
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="unite" class="form-label">Unité</label>
-                                <input type="text" class="form-control" id="unite" name="unite" 
-                                       placeholder="kg, pièce, Ar..." required>
+                                <label for="prix_unitaire" class="form-label">Prix unitaire (Ar)</label>
+                                <input type="number" class="form-control" id="prix_unitaire" name="prix_unitaire" 
+                                       min="0" step="0.01" required>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="prix_unitaire" class="form-label">Prix unitaire (Ar)</label>
-                        <input type="number" class="form-control" id="prix_unitaire" name="prix_unitaire" 
-                               min="0" step="0.01" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="priorite" class="form-label">Priorité</label>
-                        <select class="form-select" id="priorite" name="priorite" required>
-                            <option value="normale">Normale</option>
-                            <option value="urgent">Urgent</option>
-                            <option value="critique">Critique</option>
-                        </select>
                     </div>
                     
                     <button type="submit" class="btn btn-primary w-100">
@@ -130,32 +105,49 @@ ob_start();
                             <?php foreach ($besoins as $besoin): ?>
                                 <tr>
                                     <td>
-                                        <strong><?= htmlspecialchars($besoin['ville']) ?></strong>
+                                        <?php
+                                        // Trouver le nom de la ville
+                                        $nomVille = 'Ville inconnue';
+                                        foreach ($villes as $ville) {
+                                            if ($ville['id'] == $besoin['ville_id']) {
+                                                $nomVille = $ville['nom'];
+                                                break;
+                                            }
+                                        }
+                                        ?>
+                                        <strong><?= htmlspecialchars($nomVille) ?></strong>
                                     </td>
                                     <td>
                                         <?php
-                                        $typeClass = match($besoin['type']) {
-                                            'nature' => 'success',
-                                            'materiaux' => 'warning',
-                                            'argent' => 'info',
-                                            default => 'secondary'
-                                        };
-                                        $typeIcon = match($besoin['type']) {
-                                            'nature' => 'leaf',
-                                            'materiaux' => 'tools',
-                                            'argent' => 'coins',
-                                            default => 'question'
-                                        };
+                                        // Déterminer le type basé sur l'item
+                                        $item = strtolower($besoin['item']);
+                                        if (in_array($item, ['riz', 'huile', 'sucre', 'lait', 'farine'])) {
+                                            $type = 'nature';
+                                            $typeClass = 'success';
+                                            $typeIcon = 'leaf';
+                                        } elseif (in_array($item, ['tôle', 'ciment', 'clou', 'bois', 'fer'])) {
+                                            $type = 'materiaux';
+                                            $typeClass = 'warning';
+                                            $typeIcon = 'tools';
+                                        } elseif (in_array($item, ['argent', 'argent liquide'])) {
+                                            $type = 'argent';
+                                            $typeClass = 'info';
+                                            $typeIcon = 'coins';
+                                        } else {
+                                            $type = 'autre';
+                                            $typeClass = 'secondary';
+                                            $typeIcon = 'question';
+                                        }
                                         ?>
                                         <span class="badge bg-<?= $typeClass ?>">
                                             <i class="fas fa-<?= $typeIcon ?>"></i>
-                                            <?= ucfirst($besoin['type']) ?>
+                                            <?= ucfirst($type) ?>
                                         </span>
                                     </td>
-                                    <td><?= htmlspecialchars($besoin['description']) ?></td>
+                                    <td><?= htmlspecialchars($besoin['item']) ?></td>
                                     <td>
                                         <span class="badge bg-primary">
-                                            <?= number_format($besoin['quantite'], 0, ',', ' ') ?> <?= htmlspecialchars($besoin['unite']) ?>
+                                            <?= number_format($besoin['quantite'], 0, ',', ' ') ?>
                                         </span>
                                     </td>
                                     <td><?= number_format($besoin['prix_unitaire'], 0, ',', ' ') ?> Ar</td>
@@ -163,20 +155,10 @@ ob_start();
                                         <strong><?= number_format($besoin['prix_unitaire'] * $besoin['quantite'], 0, ',', ' ') ?> Ar</strong>
                                     </td>
                                     <td>
-                                        <?php
-                                        $prioriteClass = match($besoin['priorite']) {
-                                            'critique' => 'danger',
-                                            'urgent' => 'warning',
-                                            'normale' => 'success',
-                                            default => 'secondary'
-                                        };
-                                        ?>
-                                        <span class="badge bg-<?= $prioriteClass ?>">
-                                            <?= ucfirst($besoin['priorite']) ?>
-                                        </span>
+                                        <span class="badge bg-success">Normale</span>
                                     </td>
                                     <td>
-                                        <small><?= date('d/m/Y', strtotime($besoin['date'])) ?></small>
+                                        <small><?= date('d/m/Y', strtotime($besoin['date_saisie'])) ?></small>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
@@ -229,7 +211,10 @@ ob_start();
             </div>
             <div class="card-body">
                 <?php
-                $besoinsNature = array_filter($besoins, fn($b) => $b['type'] === 'nature');
+                $besoinsNature = array_filter($besoins, function($b) {
+                    $item = strtolower($b['item']);
+                    return in_array($item, ['riz', 'huile', 'sucre', 'lait', 'farine']);
+                });
                 $valeurNature = array_sum(array_map(fn($b) => $b['prix_unitaire'] * $b['quantite'], $besoinsNature));
                 ?>
                 <div class="text-center">
@@ -251,7 +236,10 @@ ob_start();
             </div>
             <div class="card-body">
                 <?php
-                $besoinsMateriaux = array_filter($besoins, fn($b) => $b['type'] === 'materiaux');
+                $besoinsMateriaux = array_filter($besoins, function($b) {
+                    $item = strtolower($b['item']);
+                    return in_array($item, ['tôle', 'ciment', 'clou', 'bois', 'fer']);
+                });
                 $valeurMateriaux = array_sum(array_map(fn($b) => $b['prix_unitaire'] * $b['quantite'], $besoinsMateriaux));
                 ?>
                 <div class="text-center">
@@ -273,7 +261,10 @@ ob_start();
             </div>
             <div class="card-body">
                 <?php
-                $besoinsArgent = array_filter($besoins, fn($b) => $b['type'] === 'argent');
+                $besoinsArgent = array_filter($besoins, function($b) {
+                    $item = strtolower($b['item']);
+                    return in_array($item, ['argent', 'argent liquide']);
+                });
                 $valeurArgent = array_sum(array_map(fn($b) => $b['prix_unitaire'] * $b['quantite'], $besoinsArgent));
                 ?>
                 <div class="text-center">

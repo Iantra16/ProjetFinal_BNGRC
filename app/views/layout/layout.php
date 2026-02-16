@@ -12,16 +12,16 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- AdminLTE 4 -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/front/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/dist/css/adminlte.min.css">
     <!-- CSS personnalisé -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/commun/css/custom.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
     <!-- CSS BNGRC -->
-    <link rel="stylesheet" href="http://localhost:8000/assets/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
     </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-    <?php include(__DIR__ . "/header.php"); ?>
+    <?php include("header.php"); ?>
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <?php include(__DIR__ . "/footer.php"); ?>
+    <?php include("footer.php"); ?>
 </div>
 
 <!-- jQuery -->
@@ -50,6 +50,6 @@
 <!-- Bootstrap 5 (pour AdminLTE 4) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
-<script src="<?= BASE_URL ?>/assets/front/dist/js/adminlte.min.js"></script>
+<script src="<?= BASE_URL ?>/assets/dist/js/adminlte.min.js"></script>
 </body>
 </html>

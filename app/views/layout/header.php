@@ -12,13 +12,13 @@
 
             <ul class="navbar-nav ms-auto bngrc-nav">
                 <li class="nav-item">
-                    <a href="/" class="nav-link<?= $_SERVER['REQUEST_URI'] == '/' ? ' active' : '' ?>">
-                        <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                    <a href="/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-list-ul"></i> Besoins
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
-                        <i class="fas fa-list-ul"></i> Besoins
+                    <a href="/villes" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/villes') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-city"></i> Villes
                     </a>
                 </li>
                 <li class="nav-item">

@@ -19,9 +19,25 @@ function getVilleNom($villeId, $villes) {
 <div class="page-header mb-4">
     <h1 class="page-title">
         <i class="fas fa-truck"></i>
-        Simulation des distributions
+        <?php if (isset($villeSelectionnee) && $villeSelectionnee): ?>
+            Distributions - <?= htmlspecialchars($villeSelectionnee['nom']) ?>
+        <?php else: ?>
+            Simulation des distributions
+        <?php endif; ?>
     </h1>
-    <p class="page-subtitle">Attribution automatique des dons aux villes selon les besoins</p>
+    <p class="page-subtitle">
+        <?php if (isset($villeSelectionnee) && $villeSelectionnee): ?>
+            Dons reçus par la ville de <?= htmlspecialchars($villeSelectionnee['nom']) ?>
+            <a href="/distributions" class="btn btn-sm btn-outline-secondary ms-2">
+                <i class="fas fa-times"></i> Voir toutes les distributions
+            </a>
+            <a href="/" class="btn btn-sm btn-outline-primary ms-2">
+                <i class="fas fa-home"></i> Retour au tableau de bord
+            </a>
+        <?php else: ?>
+            Attribution automatique des dons aux villes selon les besoins
+        <?php endif; ?>
+    </p>
 </div>
 
 <div class="row">
