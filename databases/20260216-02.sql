@@ -22,3 +22,11 @@ INSERT INTO region (nom) VALUES
 ('Vakinankaratra'),
 ('Vatovavy'),
 ('Vatovavy-Fitovinany'); 
+
+INSERT INTO type_besoin (nom) VALUES 
+('Alimentaire'),
+('Médical'),
+('Hébergement'),
+('Vêtements'),
+('Éducation'),
+('Autre');
