@@ -10,13 +10,19 @@ use Flight;
 class BesoinController
 {
 
-    public function ajouterForm()
+    public function ajouterForm($villeId = null)
     {
         $villeModel = new VilleModel(Flight::db());
         $villes = $villeModel->getAll();
         $besoinModel = new BesoinModel(Flight::db());
         $types_besoin = $besoinModel->getAllTypeBesoin();
         $articles = $besoinModel->getAllArticle();
+        
+        // Pré-remplir la ville si elle est fournie
+        $villeSelectionnee = null;
+        if ($villeId !== null) {
+            $villeSelectionnee = $villeModel->getById((int)$villeId);
+        }
         
         // Récupérer les messages de la session s'ils existent
         $success = '';
@@ -35,7 +41,8 @@ class BesoinController
             'types_besoin' => $types_besoin,
             'articles' => $articles,
             'success' => $success,
-            'error' => $error
+            'error' => $error,
+            'villeSelectionnee' => $villeSelectionnee
         ]);
     }
 

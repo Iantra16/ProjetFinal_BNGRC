@@ -29,6 +29,9 @@ $router->group('', function (Router $router) use ($app) {
         // Formulaire d'ajout de besoin
         $router->get('/', [$besoin_controller, 'ajouterForm']);
 
+        // Formulaire d'ajout de besoin avec ville pré-remplie
+        $router->get('/@villeId', [$besoin_controller, 'ajouterForm']);
+
         // Enregistrer un besoin
         $router->post('/', [$besoin_controller, 'ajouterSubmit']);
 

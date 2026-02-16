@@ -47,7 +47,8 @@ ob_start();
                                 <select name="id_ville" id="id_ville" class="form-select" required>
                                     <option value="">Sélectionnez une ville</option>
                                     <?php foreach ($villes as $v): ?>
-                                        <option value="<?= $v['id'] ?>">
+                                        <option value="<?= $v['id'] ?>" 
+                                            <?php if (isset($villeSelectionnee) && $villeSelectionnee && $villeSelectionnee['id'] == $v['id']): ?>selected<?php endif; ?>>
                                             <?= $v['nom'] ?> (<?= $v['region_nom'] ?>)
                                         </option>
                                     <?php endforeach; ?>
