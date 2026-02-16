@@ -34,13 +34,18 @@ function formatMoney($amount) {
             <div class="row mb-4">
                 <?php 
                 $totalDons = count($dons);
-                $totalValeur = array_sum(array_map(function($don) { 
-                    return $don['quantite'] * $don['valeur_unitaire']; 
-                }, $dons));
-                $donsDisponibles = count(array_filter($dons, function($don) { 
-                    return $don['statut'] === 'disponible'; 
-                }));
-                $donsDistribues = $totalDons - $donsDisponibles;
+                $totalValeur = 0;
+                $totalArticles = 0;
+                
+                // Calculer la valeur totale de tous les dons
+                foreach ($dons as $don) {
+                    if (isset($don['articles']) && is_array($don['articles'])) {
+                        foreach ($don['articles'] as $article) {
+                            $totalValeur += $article['quantite'] * $article['prix_unitaire'];
+                            $totalArticles++;
+                        }
+                    }
+                }
                 ?>
                 
                 <div class="col-md-3">
@@ -55,18 +60,18 @@ function formatMoney($amount) {
                 <div class="col-md-3">
                     <div class="card border-info">
                         <div class="card-body text-center">
-                            <i class="fas fa-warehouse fa-2x text-info mb-2"></i>
-                            <h4 class="text-info"><?= $donsDisponibles ?></h4>
-                            <small class="text-muted">Disponibles</small>
+                            <i class="fas fa-box fa-2x text-info mb-2"></i>
+                            <h4 class="text-info"><?= $totalArticles ?></h4>
+                            <small class="text-muted">Articles différents</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card border-warning">
                         <div class="card-body text-center">
-                            <i class="fas fa-truck fa-2x text-warning mb-2"></i>
-                            <h4 class="text-warning"><?= $donsDistribues ?></h4>
-                            <small class="text-muted">Distribués</small>
+                            <i class="fas fa-user fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning"><?= count(array_unique(array_column($dons, 'donateur'))) ?></h4>
+                            <small class="text-muted">Donateurs</small>
                         </div>
                     </div>
                 </div>
@@ -91,12 +96,9 @@ function formatMoney($amount) {
                             <thead class="table-dark">
                                 <tr>
                                     <th><i class="fas fa-heart"></i> Donateur</th>
-                                    <th><i class="fas fa-box"></i> Article</th>
-                                    <th><i class="fas fa-calculator"></i> Quantité</th>
-                                    <th><i class="fas fa-coins"></i> Valeur Unitaire</th>
+                                    <th><i class="fas fa-box"></i> Articles</th>
                                     <th><i class="fas fa-money-bill-wave"></i> Valeur Totale</th>
                                     <th><i class="fas fa-calendar"></i> Date du Don</th>
-                                    <th><i class="fas fa-flag"></i> Statut</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,29 +109,38 @@ function formatMoney($amount) {
                                 });
                                 
                                 foreach ($dons as $don): 
-                                    $valeurTotale = $don['quantite'] * $don['valeur_unitaire'];
-                                    $badgeClass = $don['statut'] === 'disponible' ? 'bg-success' : 'bg-warning';
-                                    $badgeText = $don['statut'] === 'disponible' ? 'Disponible' : 'Distribué';
+                                    // Calculer la valeur totale de ce don
+                                    $valeurTotaleDon = 0;
+                                    if (isset($don['articles']) && is_array($don['articles'])) {
+                                        foreach ($don['articles'] as $article) {
+                                            $valeurTotaleDon += $article['quantite'] * $article['prix_unitaire'];
+                                        }
+                                    }
                                 ?>
-                                    <tr class="<?= $don['statut'] === 'distribué' ? 'table-secondary' : '' ?>">
+                                    <tr>
                                         <td>
-                                            <strong><?= htmlspecialchars($don['donateur']) ?></strong>
+                                            <strong><?= htmlspecialchars($don['donateur'] ?? 'Anonyme') ?></strong>
                                         </td>
                                         <td>
-                                            <span class="badge bg-secondary"><?= $don['item'] ?></span>
+                                            <?php if (isset($don['articles']) && is_array($don['articles'])): ?>
+                                                <ul class="list-unstyled mb-0">
+                                                    <?php foreach ($don['articles'] as $article): ?>
+                                                        <li>
+                                                            <span class="badge bg-secondary"><?= htmlspecialchars($article['article_nom'] ?? 'Article') ?></span>
+                                                            <strong><?= number_format($article['quantite'], 2) ?></strong> <?= htmlspecialchars($article['unite'] ?? '') ?>
+                                                            <small class="text-muted">(<?= formatMoney($article['quantite'] * $article['prix_unitaire']) ?>)</small>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            <?php else: ?>
+                                                <span class="text-muted">Aucun article</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td>
-                                            <strong><?= number_format($don['quantite']) ?></strong>
-                                        </td>
-                                        <td><?= formatMoney($don['valeur_unitaire']) ?></td>
-                                        <td>
-                                            <strong class="text-success"><?= formatMoney($valeurTotale) ?></strong>
+                                            <strong class="text-success"><?= formatMoney($valeurTotaleDon) ?></strong>
                                         </td>
                                         <td>
                                             <small><?= date('d/m/Y H:i', strtotime($don['date_don'])) ?></small>
-                                        </td>
-                                        <td>
-                                            <span class="badge <?= $badgeClass ?>"><?= $badgeText ?></span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -147,39 +158,60 @@ function formatMoney($amount) {
                 <?php 
                 $repartitionArticles = [];
                 foreach ($dons as $don) {
-                    if (!isset($repartitionArticles[$don['item']])) {
-                        $repartitionArticles[$don['item']] = ['quantite' => 0, 'valeur' => 0, 'donateurs' => []];
-                    }
-                    $repartitionArticles[$don['item']]['quantite'] += $don['quantite'];
-                    $repartitionArticles[$don['item']]['valeur'] += $don['quantite'] * $don['valeur_unitaire'];
-                    if (!in_array($don['donateur'], $repartitionArticles[$don['item']]['donateurs'])) {
-                        $repartitionArticles[$don['item']]['donateurs'][] = $don['donateur'];
+                    if (isset($don['articles']) && is_array($don['articles'])) {
+                        foreach ($don['articles'] as $article) {
+                            $nom = $article['article_nom'];
+                            if (!isset($repartitionArticles[$nom])) {
+                                $repartitionArticles[$nom] = [
+                                    'quantite' => 0, 
+                                    'valeur' => 0, 
+                                    'donateurs' => [],
+                                    'unite' => $article['unite']
+                                ];
+                            }
+                            $repartitionArticles[$nom]['quantite'] += $article['quantite'];
+                            $repartitionArticles[$nom]['valeur'] += $article['quantite'] * $article['prix_unitaire'];
+                            if (!in_array($don['donateur'], $repartitionArticles[$nom]['donateurs'])) {
+                                $repartitionArticles[$nom]['donateurs'][] = $don['donateur'];
+                            }
+                        }
                     }
                 }
                 ?>
                 
-                <?php foreach ($repartitionArticles as $article => $stats): ?>
-                    <div class="col-md-4 mb-3">
-                        <div class="card border-success">
-                            <div class="card-body">
-                                <h5 class="card-title text-success">
-                                    <i class="fas fa-box"></i> <?= $article ?>
-                                </h5>
-                                <p class="card-text">
-                                    <strong>Quantité :</strong> <?= number_format($stats['quantite']) ?><br>
-                                    <strong>Valeur :</strong> <?= formatMoney($stats['valeur']) ?><br>
-                                    <strong>Donateurs :</strong> <?= count($stats['donateurs']) ?>
-                                </p>
-                                <div class="progress">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         style="width: <?= ($stats['valeur'] / $totalValeur) * 100 ?>%">
-                                        <?= round(($stats['valeur'] / $totalValeur) * 100, 1) ?>%
-                                    </div>
+                <?php if (!empty($repartitionArticles)): ?>
+                    <?php foreach ($repartitionArticles as $article => $stats): ?>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">
+                                        <i class="fas fa-box"></i> <?= htmlspecialchars($article ?? 'Article') ?>
+                                    </h5>
+                                    <p class="card-text">
+                                        <br>
+                                        <strong>Quantité :</strong> <?= number_format($stats['quantite'], 2) ?> <?= $stats['unite'] ?><br>
+                                        <strong>Valeur :</strong> <?= formatMoney($stats['valeur']) ?><br>
+                                        <strong>Donateurs :</strong> <?= count($stats['donateurs']) ?>
+                                    </p>
+                                    <?php if ($totalValeur > 0): ?>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: <?= ($stats['valeur'] / $totalValeur) * 100 ?>%">
+                                                <?= round(($stats['valeur'] / $totalValeur) * 100, 1) ?>%
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Aucune répartition disponible.
+                        </div>
                     </div>
-                <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
             <!-- Donateurs les plus généreux -->
@@ -195,37 +227,49 @@ function formatMoney($amount) {
                             $donateurs[$don['donateur']] = ['dons' => 0, 'valeur' => 0];
                         }
                         $donateurs[$don['donateur']]['dons']++;
-                        $donateurs[$don['donateur']]['valeur'] += $don['quantite'] * $don['valeur_unitaire'];
+                        
+                        // Calculer la valeur de ce don
+                        if (isset($don['articles']) && is_array($don['articles'])) {
+                            foreach ($don['articles'] as $article) {
+                                $donateurs[$don['donateur']]['valeur'] += $article['quantite'] * $article['prix_unitaire'];
+                            }
+                        }
                     }
                     arsort($donateurs);
                     $topDonateurs = array_slice($donateurs, 0, 5, true);
                     ?>
                     
-                    <div class="row">
-                        <?php $position = 1; foreach ($topDonateurs as $donateur => $stats): ?>
-                            <div class="col-md-6 col-lg-4 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <?php if ($position == 1): ?>
-                                            <i class="fas fa-trophy text-warning fa-2x"></i>
-                                        <?php elseif ($position == 2): ?>
-                                            <i class="fas fa-medal text-secondary fa-2x"></i>
-                                        <?php elseif ($position == 3): ?>
-                                            <i class="fas fa-medal text-warning fa-2x"></i>
-                                        <?php else: ?>
-                                            <i class="fas fa-star text-info fa-2x"></i>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0"><?= htmlspecialchars($donateur) ?></h6>
-                                        <small class="text-muted">
-                                            <?= $stats['dons'] ?> don(s) - <?= formatMoney($stats['valeur']) ?>
-                                        </small>
+                    <?php if (!empty($topDonateurs)): ?>
+                        <div class="row">
+                            <?php $position = 1; foreach ($topDonateurs as $donateur => $stats): ?>
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <?php if ($position == 1): ?>
+                                                <i class="fas fa-trophy text-warning fa-2x"></i>
+                                            <?php elseif ($position == 2): ?>
+                                                <i class="fas fa-medal text-secondary fa-2x"></i>
+                                            <?php elseif ($position == 3): ?>
+                                                <i class="fas fa-medal text-warning fa-2x"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-star text-info fa-2x"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0"><?= htmlspecialchars($donateur ?? 'Anonyme') ?></h6>
+                                            <small class="text-muted">
+                                                <?= $stats['dons'] ?> don(s) - <?= formatMoney($stats['valeur']) ?>
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <?php $position++; endforeach; ?>
-                    </div>
+                            <?php $position++; endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> Aucun donateur pour le moment.
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endif; ?>
