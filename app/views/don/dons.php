@@ -19,7 +19,7 @@ function formatMoney($amount) {
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3><i class="fas fa-list text-success"></i> Liste des dons</h3>
-            <a href="/dons/ajouter" class="btn btn-success">
+            <a href="<?= BASE_URL ?>/dons/ajouter" class="btn btn-success">
                 <i class="fas fa-plus"></i> Ajouter un Don
             </a>
         </div>
@@ -27,7 +27,7 @@ function formatMoney($amount) {
         <?php if (empty($dons)): ?>
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
-                Aucun don enregistré. <a href="/dons/ajouter">Commencez par ajouter un don</a>.
+                Aucun don enregistré. <a href="<?= BASE_URL ?>/dons/ajouter">Commencez par ajouter un don</a>.
             </div>
         <?php else: ?>
             <!-- Statistiques des dons -->

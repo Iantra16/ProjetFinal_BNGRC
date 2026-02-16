@@ -152,10 +152,10 @@ $distributions = $distributions ?? [];
                 <!-- Boutons d'action -->
                 <div class="card-footer bg-light">
                     <div class="d-grid gap-2">
-                        <a href="/villes/<?= $ville['id'] ?>/besoins" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-list-ul"></i> Voir les besoins
+                        <a href="<?= BASE_URL ?>/villes/<?= $ville['id'] ?>/besoins" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> Voir les besoins
                         </a>
-                        <a href="/distributions?ville=<?= $ville['id'] ?>" class="btn btn-outline-success btn-sm">
+                        <a href="<?= BASE_URL ?>/distributions?ville=<?= $ville['id'] ?>" class="btn btn-outline-success btn-sm">
                             <i class="fas fa-gift"></i> Voir les dons reçus
                         </a>
                     </div>

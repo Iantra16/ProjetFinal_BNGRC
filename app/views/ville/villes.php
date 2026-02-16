@@ -9,10 +9,10 @@ $villes = $villes ?? [];
 <!-- Actions -->
 <div class="row mb-3">
     <div class="col-12">
-        <a href="/villes/ajouter" class="btn btn-primary">
+        <a href="<?= BASE_URL ?>/villes/ajouter" class="btn btn-primary">
             <i class="fas fa-plus"></i> Ajouter une Ville
         </a>
-        <a href="/villes/besoins" class="btn btn-success">
+        <a href="<?= BASE_URL ?>/villes/besoins" class="btn btn-success">
             <i class="fas fa-list"></i> Gérer les Besoins par Ville
         </a>
     </div>
@@ -54,12 +54,12 @@ $villes = $villes ?? [];
                                                     </td>
                                                     <td>
                                                         <div class="btn-group" role="group">
-                                                            <a href="/villes/<?= $ville['id'] ?>/besoins" 
+                                                            <a href="<?= BASE_URL ?>/villes/<?= $ville['id'] ?>/besoins" 
                                                                class="btn btn-sm btn-success btn-avec-icone" 
                                                                title="Gérer les besoins">
                                                                 <i class="fas fa-list"></i> Besoins
                                                             </a>
-                                                            <a href="/besoins/<?= $ville['id'] ?>" 
+                                                            <a href="<?= BASE_URL ?>/besoins/<?= $ville['id'] ?>" 
                                                                class="btn btn-sm btn-primary btn-avec-icone" 
                                                                title="Ajouter un besoin">
                                                                 <i class="fas fa-plus"></i> Ajouter Besoin

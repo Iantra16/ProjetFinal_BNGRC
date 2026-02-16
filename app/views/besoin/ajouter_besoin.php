@@ -36,7 +36,7 @@ ob_start();
                     </div>
                 <?php endif; ?>
                 
-                <form method="POST" action="/besoins" id="formBesoin">
+                <form method="POST" action="<?= BASE_URL ?>/besoins" id="formBesoin">
                     <!-- Ville -->
                     <div class="row mb-4">
                         <div class="col-12">
@@ -47,8 +47,7 @@ ob_start();
                                 <select name="id_ville" id="id_ville" class="form-select" required>
                                     <option value="">Sélectionnez une ville</option>
                                     <?php foreach ($villes as $v): ?>
-                                        <option value="<?= $v['id'] ?>" 
-                                            <?php if (isset($villeSelectionnee) && $villeSelectionnee && $villeSelectionnee['id'] == $v['id']): ?>selected<?php endif; ?>>
+                                        <option value="<?= $v['id'] ?>">
                                             <?= $v['nom'] ?> (<?= $v['region_nom'] ?>)
                                         </option>
                                     <?php endforeach; ?>
@@ -103,7 +102,7 @@ ob_start();
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-save"></i> Enregistrer le Besoin
                         </button>
-                        <a href="/villes" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/villes" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Retour
                         </a>
                     </div>
