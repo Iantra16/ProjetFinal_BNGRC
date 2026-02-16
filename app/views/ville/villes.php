@@ -36,7 +36,6 @@ $villes = $villes ?? [];
                                     <table class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Nom de la Ville</th>
                                                 <th>Région</th>
                                                 <th>Actions</th>
@@ -45,7 +44,6 @@ $villes = $villes ?? [];
                                         <tbody>
                                             <?php foreach ($villes as $ville): ?>
                                                 <tr>
-                                                    <td><?= htmlspecialchars($ville['id']) ?></td>
                                                     <td>
                                                         <strong><?= htmlspecialchars($ville['nom']) ?></strong>
                                                     </td>
