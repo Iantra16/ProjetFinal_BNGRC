@@ -1,48 +1,36 @@
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-                    <i class="fas fa-bars"></i>
-                </a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="<?= BASE_URL ?>/user" class="nav-link">Accueil</a>
-            </li>
-        </ul>
+    <nav class="main-header navbar navbar-expand navbar-dark bngrc-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand bngrc-brand" href="/">
+                <i class="fas fa-hands-helping"></i>
+                <span class="brand-text">BNGRC - Suivi des Dons</span>
+            </a>
+            
+            <button class="navbar-toggler sidebar-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
 
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a href="<?= BASE_URL ?>/user/logout" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="<?= BASE_URL ?>/user" class="brand-link">
-            <i class="fas fa-exchange-alt ms-2"></i>
-            <span class="brand-text font-weight-light ps-3"> Takalo-takalo</span>
-        </a>
-
-        <div class="sidebar">
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-                    <li class="nav-item">
-                        <a href="<?= BASE_URL ?>/user" class="nav-link">
-                            <i class="nav-icon fas fa-home"></i>
-                            <p>Accueil</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?= BASE_URL ?>/user/myobject" class="nav-link">
-                            <i class="nav-icon fas fa-box"></i>
-                            <p>Mes objets</p>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <ul class="navbar-nav ms-auto bngrc-nav">
+                <li class="nav-item">
+                    <a href="/" class="nav-link<?= $_SERVER['REQUEST_URI'] == '/' ? ' active' : '' ?>">
+                        <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/besoins" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/besoins') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-list-ul"></i> Besoins
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/dons" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/dons') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-gift"></i> Dons
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/distributions" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/distributions') !== false ? ' active' : '' ?>">
+                        <i class="fas fa-truck"></i> Distributions
+                    </a>
+                </li>
+            </ul>
         </div>
-    </aside>
+    </nav>
