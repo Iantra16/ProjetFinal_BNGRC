@@ -1,8 +1,8 @@
 <footer class="main-footer">
     <div class="container">
-        <strong>Takalo-takalo &copy; 2026</strong> - Plateforme d'échange d'objets
+        <strong>BNGRC &copy; 2026</strong> - Plateforme Dons
         <div class="float-end d-none d-sm-inline-block">
-            Réalisé par: <strong>Votre Nom - ETU123456 / Coéquipier - ETU789012</strong>
+            Réalisé par: <strong> ETU004200 _ ETU003970 _ ETU003967</strong>
         </div>
     </div>
 </footer>
