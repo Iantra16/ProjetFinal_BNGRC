@@ -3,67 +3,76 @@ use bngrc;
 
 -- Types de besoins
 CREATE TABLE type_besoin (
-    id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL  -- 'nature', 'materiaux', 'argent'    
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL  -- 'nature', 'materiaux', 'argent'
 );
 
 -- Articles/Produits
 CREATE TABLE article (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prix_unitaire DECIMAL(12,2) NOT NULL,
     unite VARCHAR(20) NOT NULL,
-    id_type_besoin INT REFERENCES type_besoin(id)
+    id_type_besoin INT,
+    FOREIGN KEY (id_type_besoin) REFERENCES type_besoin(id)
 );
 
 -- Régions
 CREATE TABLE region (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL
 );
 
 -- Villes
 CREATE TABLE ville (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
-    id_region INT REFERENCES region(id)
+    id_region INT,
+    FOREIGN KEY (id_region) REFERENCES region(id)
 );
 
 -- Besoin (par ville, sans article directement)
 CREATE TABLE besoin (
-    id SERIAL PRIMARY KEY,
-    id_ville INT REFERENCES ville(id),
-    date_saisie TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_ville INT,
+    date_saisie TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_ville) REFERENCES ville(id)
 );
 
 -- NOUVELLE TABLE : Articles dans un besoin
 CREATE TABLE besoin_article (
-    id SERIAL PRIMARY KEY,
-    id_besoin INT REFERENCES besoin(id),
-    id_article INT REFERENCES article(id),
-    quantite DECIMAL(12,2) NOT NULL
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_besoin INT,
+    id_article INT,
+    quantite DECIMAL(12,2) NOT NULL,
+    FOREIGN KEY (id_besoin) REFERENCES besoin(id),
+    FOREIGN KEY (id_article) REFERENCES article(id)
 );
 
 -- Don recue
 CREATE TABLE don (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     donateur VARCHAR(200),
     date_don TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Articles dans un don
 CREATE TABLE don_article (
-    id SERIAL PRIMARY KEY,
-    id_don INT REFERENCES don(id),
-    id_article INT REFERENCES article(id),
-    quantite DECIMAL(12,2) NOT NULL
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_don INT,
+    id_article INT,
+    quantite DECIMAL(12,2) NOT NULL,
+    FOREIGN KEY (id_don) REFERENCES don(id),
+    FOREIGN KEY (id_article) REFERENCES article(id)
 );
 
 -- lie don_article à besoin_article
 CREATE TABLE distribution (
-    id SERIAL PRIMARY KEY,
-    id_don_article INT REFERENCES don_article(id),
-    id_besoin_article INT REFERENCES besoin_article(id),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_don_article INT,
+    id_besoin_article INT,
     quantite_attribuee DECIMAL(12,2) NOT NULL,
-    date_distribution TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date_distribution TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_don_article) REFERENCES don_article(id),
+    FOREIGN KEY (id_besoin_article) REFERENCES besoin_article(id)
 );
