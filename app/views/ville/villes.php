@@ -59,7 +59,7 @@ $villes = $villes ?? [];
                                                                title="Gérer les besoins">
                                                                 <i class="fas fa-list"></i> Besoins
                                                             </a>
-                                                            <a href="/villes/<?= $ville['id'] ?>/besoins/ajouter" 
+                                                            <a href="/besoins/<?= $ville['id'] ?>" 
                                                                class="btn btn-sm btn-primary btn-avec-icone" 
                                                                title="Ajouter un besoin">
                                                                 <i class="fas fa-plus"></i> Ajouter Besoin

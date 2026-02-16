@@ -10,7 +10,7 @@ use Flight;
 class BesoinController
 {
 
-    public function ajouterForm()
+    public function ajouterForm($villeId = null)
     {
         $villeModel = new VilleModel(Flight::db());
         $villes = $villeModel->getAll();
@@ -18,18 +18,31 @@ class BesoinController
         $types_besoin = $besoinModel->getAllTypeBesoin();
         $articles = $besoinModel->getAllArticle();
         
-        // Récupérer le message de succès de la session s'il existe
+        // Pré-remplir la ville si elle est fournie
+        $villeSelectionnee = null;
+        if ($villeId !== null) {
+            $villeSelectionnee = $villeModel->getById((int)$villeId);
+        }
+        
+        // Récupérer les messages de la session s'ils existent
         $success = '';
+        $error = '';
         if (isset($_SESSION['success_message'])) {
             $success = $_SESSION['success_message'];
             unset($_SESSION['success_message']);
+        }
+        if (isset($_SESSION['error_message'])) {
+            $error = $_SESSION['error_message'];
+            unset($_SESSION['error_message']);
         }
         
         Flight::render('besoin/ajouter_besoin', [
             'villes' => $villes,
             'types_besoin' => $types_besoin,
             'articles' => $articles,
-            'success' => $success
+            'success' => $success,
+            'error' => $error,
+            'villeSelectionnee' => $villeSelectionnee
         ]);
     }
 
@@ -38,98 +51,67 @@ class BesoinController
         $db = Flight::db();
         $villeModel = new VilleModel($db);
         $besoinModel = new BesoinModel($db);
-        $villes = $villeModel->getAll();
-        $types_besoin = $besoinModel->getAllTypeBesoin();
-        $articles = $besoinModel->getAllArticle();
-
+        
         $idVille = isset($_POST['id_ville']) ? (int)$_POST['id_ville'] : 0;
-        $idTypeBesoin = isset($_POST['type_besoin_principal']) ? (int)$_POST['type_besoin_principal'] : 0;
+        $articlesData = $_POST['articles'] ?? [];
 
-        // Trouver le libellé du type sélectionné
-        $typeLibelle = '';
-        foreach ($types_besoin as $tb) {
-            if ($tb['id'] == $idTypeBesoin) {
-                $typeLibelle = strtolower($tb['libelle']);
-                break;
-            }
-        }
-
-        if ($idVille <= 0 || $idTypeBesoin <= 0) {
-            Flight::render('besoin/ajouter_besoin', [
-                'villes' => $villes,
-                'types_besoin' => $types_besoin,
-                'articles' => $articles,
-                'error' => "Veuillez sélectionner une ville et un type de besoin."
-            ]);
+        // Validation de la ville
+        if ($idVille <= 0) {
+            $_SESSION['error_message'] = "Veuillez sélectionner une ville.";
+            Flight::redirect('/besoins');
             return;
         }
 
-        $idArticle = 0;
-        $quantite = 0;
-
-        if ($typeLibelle === 'argent') {
-            $montant = isset($_POST['somme_argent']) ? (float)$_POST['somme_argent'] : 0;
-            if ($montant <= 0) {
-                Flight::render('besoin/ajouter_besoin', [
-                    'villes' => $villes,
-                    'types_besoin' => $types_besoin,
-                    'articles' => $articles,
-                    'error' => "Veuillez entrer une somme d'argent valide."
-                ]);
-                return;
-            }
-
-            // Gestion de l'article "Argent"
-            // On cherche s'il existe déjà un article "Argent" pour ce type
-            // Sinon on le crée
-            $articleArgent = null;
-            foreach ($articles as $art) {
-                if ($art['id_type_besoin'] == $idTypeBesoin && strtolower($art['nom']) === 'argent') {
-                    $articleArgent = $art;
-                    break;
-                }
-            }
-
-            if ($articleArgent) {
-                $idArticle = $articleArgent['id'];
-            }
-            else {
-                // Création automatique de l'article Argent
-                $idArticle = $besoinModel->createArticle('Argent', $idTypeBesoin, 1, 'Ar');
-            }
-            // Pour argent, la quantité est toujours 1 (on stocke le montant en quantité)
-            $quantite = $montant;
-
+        // Validation des articles
+        if (empty($articlesData)) {
+            $_SESSION['error_message'] = "Veuillez ajouter au moins un article.";
+            Flight::redirect('/besoins');
+            return;
         }
-        else {
-            // Nature ou Matériaux
-            $idArticle = isset($_POST['id_article_existant']) ? (int)$_POST['id_article_existant'] : 0;
-            $quantite = isset($_POST['quantite']) ? (float)$_POST['quantite'] : 0;
 
-            if ($idArticle <= 0 || $quantite <= 0) {
-                Flight::render('besoin/ajouter_besoin', [
-                    'villes' => $villes,
-                    'types_besoin' => $types_besoin,
-                    'articles' => $articles,
-                    'error' => "Tous les champs sont obligatoires."
-                ]);
-                return;
+        // Préparer les articles pour insertion
+        $articlesForBesoin = [];
+        foreach ($articlesData as $articleLine) {
+            if (!empty($articleLine['article_id']) && !empty($articleLine['quantite'])) {
+                $articlesForBesoin[] = [
+                    'id_article' => (int)$articleLine['article_id'],
+                    'quantite' => (float)$articleLine['quantite']
+                ];
             }
         }
 
-        $besoinId = $besoinModel->createBesoin($idVille);
-        $besoinModel->addArticleToBesoin($besoinId, $idArticle, $quantite);
-
-        // Déterminer le message de succès selon le type
-        if ($typeLibelle === 'argent') {
-            $_SESSION['success_message'] = "✅ Le besoin en argent de " . number_format($quantite, 0, ',', ' ') . " Ar a été enregistré avec succès !";
-        } else {
-            $villeData = array_filter($villes, fn($v) => $v['id'] == $idVille);
-            $villeName = array_pop($villeData)['nom'] ?? 'la ville';
-            $_SESSION['success_message'] = "✅ Le besoin pour " . $villeName . " a été enregistré avec succès !";
+        if (empty($articlesForBesoin)) {
+            $_SESSION['error_message'] = "Aucun article valide n'a été ajouté.";
+            Flight::redirect('/besoins');
+            return;
         }
 
-        Flight::redirect('/besoins');
+        // Créer le besoin avec ses articles
+        try {
+            $db->beginTransaction();
+            
+            // Créer le besoin
+            $besoinId = $besoinModel->createBesoin($idVille);
+            
+            // Ajouter les articles au besoin
+            foreach ($articlesForBesoin as $article) {
+                $besoinModel->addArticleToBesoin($besoinId, $article['id_article'], $article['quantite']);
+            }
+            
+            $db->commit();
+            
+            // Récupérer le nom de la ville pour le message
+            $ville = $villeModel->getById($idVille);
+            $villeName = $ville['nom'] ?? 'la ville';
+            
+            $_SESSION['success_message'] = "✅ Le besoin pour " . $villeName . " a été enregistré avec succès ! (" . count($articlesForBesoin) . " article(s) ajouté(s))";
+            Flight::redirect('/besoins');
+            
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $_SESSION['error_message'] = "Erreur lors de l'enregistrement : " . $e->getMessage();
+            Flight::redirect('/besoins');
+        }
     }
 
     public function ajouterArticleAjax()

@@ -5,6 +5,7 @@ use app\controllers\VilleController;
 use app\controllers\DashboardController;
 use app\controllers\BesoinController;
 use app\controllers\ArticleController;
+use app\controllers\DonController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -28,6 +29,9 @@ $router->group('', function (Router $router) use ($app) {
         // Formulaire d'ajout de besoin
         $router->get('/', [$besoin_controller, 'ajouterForm']);
 
+        // Formulaire d'ajout de besoin avec ville pré-remplie
+        $router->get('/@villeId', [$besoin_controller, 'ajouterForm']);
+
         // Enregistrer un besoin
         $router->post('/', [$besoin_controller, 'ajouterSubmit']);
 
@@ -47,51 +51,22 @@ $router->group('', function (Router $router) use ($app) {
 
         
     });
-    
-    // // Gestion des besoins par ville
-    // $router->get('/besoins', function () use ($app) {
-    //     $controller = new BngrcController();
-    //     $controller->besoins();
-    // });
-
-    // // Ajouter un besoin
-    // $router->get('/besoins/ajouter', function () use ($app) {
-    //     $controller = new BngrcController();
-    //     $controller->ajouterBesoin();
-    // });
-
-    // $router->post('/besoins/ajouter', function () use ($app) {
-    //     $controller = new BngrcController();
-    //     $controller->ajouterBesoin();
-    // });
 
     // Gestion des dons
-    $router->get('/dons', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->dons();
+    $router->group('/dons', function (Router $router) use ($app) {
+        $don_controller = new DonController();
+
+        // Liste des dons
+        $router->get('/', [$don_controller, 'list']);
+
+        // Formulaire d'ajout de don
+        $router->get('/ajouter', [$don_controller, 'add']);
+
+        // Enregistrer un don
+        $router->post('/ajouter', [$don_controller, 'add']);
     });
 
-    // Ajouter un don
-    $router->get('/dons/ajouter', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterDon();
-    });
-
-    $router->post('/dons/ajouter', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterDon();
-    });
-
-    // Simulation des distributions
-    $router->get('/distributions', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->distributions();
-    });
-
-    $router->post('/distributions/simuler', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->simulerDistributions();
-    });
+ 
     
 
     // Gestion des villes
@@ -106,30 +81,17 @@ $router->group('', function (Router $router) use ($app) {
 
         // Traitement de l'ajout de ville
         $router->post('/ajouter', [$ville_controller, 'add']);
+
+        // Voir les besoins d'une ville
+        $router->get('/@id/besoins', [$ville_controller, 'besoins']);
     });
 
-    // Sélectionner une ville pour gérer ses besoins
-    $router->get('/villes/besoins', function () use ($app) {
-        $controller = new BngrcController();
-        $controller->besoinVille();
-    });
+    // Gestion des distributions
+    $router->group('/distributions', function (Router $router) use ($app) {
+        $don_controller = new DonController();
 
-    // Afficher les besoins d'une ville spécifique
-    $router->get('/villes/@id:[0-9]+/besoins', function ($id) use ($app) {
-        $controller = new BngrcController();
-        $controller->besoinVille($id);
-    });
-
-    // Formulaire d'ajout de besoin pour une ville spécifique
-    $router->get('/villes/@id:[0-9]+/besoins/ajouter', function ($id) use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterBesoinVille($id);
-    });
-
-    // Traitement de l'ajout de besoin pour une ville spécifique
-    $router->post('/villes/@id:[0-9]+/besoins/ajouter', function ($id) use ($app) {
-        $controller = new BngrcController();
-        $controller->ajouterBesoinVille($id);
+        // Liste des distributions (avec filtre optionnel par ville)
+        $router->get('/', [$don_controller, 'distributions']);
     });
 
 });

@@ -26,10 +26,23 @@ class VilleController {
         Flight::render('ville/villes', ['villes' => $villes]);
     }
 
-    public function dashboard() {
+    public function besoins($id) {
         $vM = new VilleModel(Flight::db());
-        $totalVilles = $vM->count();
-        Flight::render('dashboard', ['totalVilles' => $totalVilles]);
+        $ville = $vM->getById($id);
+        
+        if (!$ville) {
+            Flight::redirect('/villes');
+            return;
+        }
+        
+        $bM = new \app\models\BesoinModel(Flight::db());
+        $besoins = $bM->getBesoinsByVille($id);
+        
+        Flight::render('ville/besoin_ville', [
+            'ville' => $ville,
+            'besoins' => $besoins
+        ]);
     }
+
 
 }
