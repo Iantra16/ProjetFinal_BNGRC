@@ -10,7 +10,13 @@ ob_start();
                 <h3>📋 Saisir un Nouveau Besoin</h3>
             </div>
             <div class="card-body">
+                <?php if (!empty($error)): ?>
+                    <div class="alert alert-danger">
+                        <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                <?php endif; ?>
                 <form method="POST" id="formBesoin">
+                    <input type="hidden" name="id_article_nouveau" id="id_article_nouveau" value="">
                     
                     <!-- 1. SÉLECTION VILLE -->
                     <div class="mb-3">
@@ -47,7 +53,7 @@ ob_start();
                             <div class="card-body">
                                 <!-- Filtre par type -->
                                 <div class="mb-3">
-                                    <label>🏷️ Type de Besoin (filtre)</label>
+                                    <label>🏷️ Type de Besoin</label>
                                     <select id="type_besoin_filter" class="form-select">
                                         <option value="">Tous</option>
                                         <?php foreach ($types_besoin as $type): ?>
@@ -114,11 +120,16 @@ ob_start();
                                             <option value="pièce">
                                             <option value="sac">
                                             <option value="tôle">
+                                            <option value="carton">
+                                            <option value="boite">
                                         </datalist>
                                     </div>
-                                </div>
-                                <div class="alert alert-warning">
-                                    ⚠️ Cet article sera ajouté à la BDD
+                                    <div class="col-12">
+                                        <button type="button" id="btn-ajouter-article" class="btn btn-success">
+                                            OK - Ajouter l'article
+                                        </button>
+                                        <span id="article-status" class="ms-2 text-muted"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -193,6 +204,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const nouveauUnite = document.getElementById('nouveau_unite');
     const nouveauNom = document.getElementById('nouveau_nom');
     const nouveauType = document.getElementById('nouveau_type');
+    const btnAjouterArticle = document.getElementById('btn-ajouter-article');
+    const articleStatus = document.getElementById('article-status');
+    const idArticleNouveau = document.getElementById('id_article_nouveau');
+    const allArticleOptions = Array.from(articleExistant.options);
     
     let prixUnitaire = 0;
     
@@ -220,14 +235,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Filtrer les articles par type
     typeFilter.addEventListener('change', function() {
         const typeId = this.value;
-        Array.from(articleExistant.options).forEach(option => {
-            if (option.value === '') return;
-            if (!typeId || option.dataset.type === typeId) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
+        articleExistant.innerHTML = '';
+        allArticleOptions.forEach(option => {
+            if (option.value === '' || !typeId || option.dataset.type === typeId) {
+                articleExistant.appendChild(option);
             }
         });
+        articleExistant.value = '';
+        prixUnitaire = 0;
+        uniteDisplay.textContent = 'unité';
+        valeurEstimee.value = '';
     });
     
     // Sélection article existant
@@ -269,6 +286,66 @@ document.addEventListener('DOMContentLoaded', function() {
             valeurEstimee.value = '';
         }
     }
+
+    // Ajouter un nouvel article via AJAX
+    btnAjouterArticle.addEventListener('click', async () => {
+        articleStatus.textContent = '';
+
+        const nom = nouveauNom.value.trim();
+        const idTypeBesoin = nouveauType.value;
+        const prix = nouveauPrix.value;
+        const unite = nouveauUnite.value.trim();
+
+        if (!nom || !idTypeBesoin || !prix || !unite) {
+            articleStatus.textContent = "Veuillez remplir tous les champs du nouvel article.";
+            articleStatus.classList.remove('text-success');
+            articleStatus.classList.add('text-danger');
+            return;
+        }
+
+        try {
+            const body = new URLSearchParams({
+                nom,
+                id_type_besoin: idTypeBesoin,
+                prix_unitaire: prix,
+                unite
+            });
+
+            const response = await fetch('/besoins/article', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Erreur lors de l\'ajout de l\'article.');
+            }
+
+            const option = document.createElement('option');
+            option.value = data.article.id;
+            option.dataset.type = data.article.id_type_besoin;
+            option.dataset.prix = data.article.prix_unitaire;
+            option.dataset.unite = data.article.unite;
+            option.textContent = `${data.article.nom} (${new Intl.NumberFormat('fr-FR').format(Math.round(data.article.prix_unitaire))} Ar/${data.article.unite})`;
+            articleExistant.appendChild(option);
+            articleExistant.value = data.article.id;
+
+            idArticleNouveau.value = data.article.id;
+            prixUnitaire = parseFloat(data.article.prix_unitaire) || 0;
+            uniteDisplay.textContent = data.article.unite;
+            calculer();
+
+            articleStatus.textContent = "Article ajoute avec succes.";
+            articleStatus.classList.remove('text-danger');
+            articleStatus.classList.add('text-success');
+        } catch (error) {
+            articleStatus.textContent = error.message;
+            articleStatus.classList.remove('text-success');
+            articleStatus.classList.add('text-danger');
+        }
+    });
 });
 </script>
 

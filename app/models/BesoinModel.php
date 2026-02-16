@@ -26,6 +26,15 @@ class BesoinModel
         return $sql->fetchAll();
     }
 
+    public function createArticle($nom, $idTypeBesoin, $prixUnitaire, $unite)
+    {
+        $sql = $this->db->prepare(
+            "INSERT INTO article (nom, prix_unitaire, unite, id_type_besoin) VALUES (?, ?, ?, ?)"
+        );
+        $sql->execute([$nom, $prixUnitaire, $unite, $idTypeBesoin]);
+        return $this->db->lastInsertId();
+    }
+
     /**
      * Récupérer tous les besoins avec infos ville
      */

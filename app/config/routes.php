@@ -26,6 +26,12 @@ $router->group('', function (Router $router) use ($app) {
 
         // Formulaire d'ajout de besoin
         $router->get('/', [$besoin_controller, 'ajouterForm']);
+
+        // Enregistrer un besoin
+        $router->post('/', [$besoin_controller, 'ajouterSubmit']);
+
+        // Ajouter un nouvel article (AJAX)
+        $router->post('/article', [$besoin_controller, 'ajouterArticleAjax']);
         
     });
     
