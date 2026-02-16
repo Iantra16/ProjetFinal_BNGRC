@@ -7,6 +7,9 @@ use app\controllers\BesoinController;
 use app\controllers\ArticleController;
 use app\controllers\DonController;
 use app\controllers\DistributoinController;
+use app\controllers\ConfigController;
+use app\controllers\AchatController;
+use app\controllers\RecapController;
 use flight\Engine;
 use flight\net\Router;
 
@@ -95,8 +98,79 @@ $router->group('', function (Router $router) use ($app) {
         $router->get('/', [$distrobutoinControleur, 'distributions']);
         
         // Simulateur de distribution
-        $router->get('/simulateur', [$distrobutoinControleur, 'Simulateur']);
+        $router->get('/simulateur', [$distrobutoinControleur, 'SimulateurPage']);
         $router->post('/simuler', [$distrobutoinControleur, 'Simulatoin_Distributoin']);
+        
+        // Valider la distribution (V2)
+        $router->post('/valider', [$distrobutoinControleur, 'Valider_Distribution']);
+    });
+
+    // ==================== ROUTES V2 ====================
+
+    // Gestion de la configuration
+    $router->group('/config', function (Router $router) use ($app) {
+        $config_controller = new ConfigController();
+
+        // Page de configuration
+        $router->get('/', [$config_controller, 'index']);
+        
+        // Mettre à jour les frais
+        $router->post('/frais', [$config_controller, 'updateFrais']);
+        
+        // API: Récupérer les frais (Ajax)
+        $router->get('/api/frais', [$config_controller, 'getFraisApi']);
+    });
+
+    // Gestion des achats (via dons argent)
+    $router->group('/achats', function (Router $router) use ($app) {
+        $achat_controller = new AchatController();
+
+        // Liste des achats
+        $router->get('/', [$achat_controller, 'list']);
+        
+        // Liste filtrée par ville
+        $router->get('/ville/@villeId', [$achat_controller, 'listByVille']);
+        
+        // Formulaire d'achat
+        $router->get('/ajouter', [$achat_controller, 'addForm']);
+        
+        // Traitement de l'achat
+        $router->post('/ajouter', [$achat_controller, 'add']);
+        
+        // Supprimer un achat
+        $router->post('/supprimer/@achatId', [$achat_controller, 'delete']);
+        
+        // API: Vérifier si article existe dans dons
+        $router->get('/api/check-article', [$achat_controller, 'checkArticleApi']);
+        
+        // API: Calculer montant avec frais
+        $router->get('/api/calculer', [$achat_controller, 'calculerMontantApi']);
+        
+        // API: Récupérer solde argent
+        $router->get('/api/solde', [$achat_controller, 'getSoldeApi']);
+    });
+
+    // Page de récapitulation
+    $router->group('/recap', function (Router $router) use ($app) {
+        $recap_controller = new RecapController();
+
+        // Page principale
+        $router->get('/', [$recap_controller, 'index']);
+        
+        // API: Récupérer récap général (Ajax)
+        $router->get('/api/general', [$recap_controller, 'getRecapApi']);
+        
+        // API: Récap par ville
+        $router->get('/api/villes', [$recap_controller, 'getRecapParVilleApi']);
+        
+        // API: Récap par type
+        $router->get('/api/types', [$recap_controller, 'getRecapParTypeApi']);
+        
+        // API: Récap dons
+        $router->get('/api/dons', [$recap_controller, 'getRecapDonsApi']);
+        
+        // API: Dashboard complet (bouton actualiser)
+        $router->get('/api/dashboard', [$recap_controller, 'getDashboardApi']);
     });
 
 });

@@ -81,4 +81,82 @@ class DistributoinController
         
         Flight::json($simulation);
     }
+
+    /**
+     * Valider et enregistrer la distribution (dispatch réel)
+     */
+    public function Valider_Distribution() {
+        $db = Flight::db();
+        
+        $donModel = new DonModel($db);
+        $stockDisponible = $donModel->Get_Reste_dons_disponibles();
+        
+        $distributionsModel = new DistributionModel($db);
+        $distributions = $distributionsModel->DistributoinDons($stockDisponible);
+        
+        if (empty($distributions)) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Aucune distribution à effectuer.'
+            ]);
+            return;
+        }
+        
+        try {
+            $db->beginTransaction();
+            
+            $count = 0;
+            foreach ($distributions as $dist) {
+                $sql = $db->prepare(
+                    "INSERT INTO distribution (id_don_article, id_besoin_article, quantite_attribuee) 
+                     VALUES (?, ?, ?)"
+                );
+                $sql->execute([
+                    $dist['id_don_article'],
+                    $dist['id_besoin_article'],
+                    $dist['quantite_attribuee']
+                ]);
+                $count++;
+            }
+            
+            $db->commit();
+            
+            Flight::json([
+                'success' => true,
+                'message' => '✅ Distribution validée ! ' . $count . ' attribution(s) effectuée(s).',
+                'count' => $count
+            ]);
+            
+        } catch (\Exception $e) {
+            $db->rollBack();
+            Flight::json([
+                'success' => false,
+                'message' => '❌ Erreur: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Page de simulation avec boutons Simuler et Valider
+     */
+    public function SimulateurPage() {
+        $db = Flight::db();
+        
+        $donModel = new DonModel($db);
+        $restdons = $donModel->Get_Reste_dons_disponibles();
+        
+        $besoinModel = new BesoinModel($db);
+        $besoinsRestants = $besoinModel->getReste_besoin();
+        
+        $success = $_SESSION['success_message'] ?? '';
+        $error = $_SESSION['error_message'] ?? '';
+        unset($_SESSION['success_message'], $_SESSION['error_message']);
+        
+        Flight::render('distribution/simulateur', [
+            'restdons' => $restdons,
+            'besoins_restants' => $besoinsRestants,
+            'success' => $success,
+            'error' => $error
+        ]);
+    }
 }

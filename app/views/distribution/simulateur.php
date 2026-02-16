@@ -14,8 +14,11 @@ ob_start();
 
 <div class="row mb-3">
     <div class="col-12 text-end">
-        <button id="btn-simuler" class="btn btn-lg btn-success shadow">
-            <i class="fas fa-play"></i> Lancer la Simulation
+        <button id="btn-simuler" class="btn btn-lg btn-success shadow me-2">
+            <i class="fas fa-play"></i> Simuler
+        </button>
+        <button id="btn-valider" class="btn btn-lg btn-primary shadow d-none" disabled>
+            <i class="fas fa-check-circle"></i> Valider la Distribution
         </button>
     </div>
 </div>
@@ -104,8 +107,12 @@ ob_start();
 </style>
 
 <script>
+let simulationData = [];
+
+// Bouton SIMULER
 document.getElementById('btn-simuler').addEventListener('click', function() {
     const btn = this;
+    const btnValider = document.getElementById('btn-valider');
     const loading = document.getElementById('simulation-loading');
     const placeholder = document.getElementById('simulation-placeholder');
     const container = document.getElementById('simulation-container');
@@ -114,6 +121,7 @@ document.getElementById('btn-simuler').addEventListener('click', function() {
     // UI Feedback
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Simulation...';
+    btnValider.classList.add('d-none');
     
     placeholder.classList.add('d-none');
     container.classList.add('d-none');
@@ -124,10 +132,12 @@ document.getElementById('btn-simuler').addEventListener('click', function() {
     })
     .then(response => response.json())
     .then(data => {
+        simulationData = data;
         resultBody.innerHTML = '';
         
         if (data.length === 0) {
             resultBody.innerHTML = '<tr><td colspan="3" class="text-center py-3 text-muted">Aucune distribution n\'est nécessaire ou possible avec le stock actuel.</td></tr>';
+            btnValider.classList.add('d-none');
         } else {
             data.forEach(item => {
                 const tr = document.createElement('tr');
@@ -135,24 +145,71 @@ document.getElementById('btn-simuler').addEventListener('click', function() {
                     <td><strong>${item.ville_nom}</strong></td>
                     <td>${item.article_nom}</td>
                     <td class="text-end">
-                        <span class="badge bg-success">${item.quantite_attribuee.toLocaleString()}</span>
+                        <span class="badge bg-success">${Number(item.quantite_attribuee).toLocaleString()}</span>
                         <small class="text-muted">${item.unite}</small>
                     </td>
                 `;
                 resultBody.appendChild(tr);
             });
+            
+            // Afficher le bouton Valider
+            btnValider.classList.remove('d-none');
+            btnValider.disabled = false;
         }
 
         loading.classList.add('d-none');
         container.classList.remove('d-none');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-play"></i> Lancer la Simulation';
+        btn.innerHTML = '<i class="fas fa-play"></i> Simuler';
     })
     .catch(error => {
         console.error('Erreur:', error);
         alert('Une erreur est survenue lors de la simulation.');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-play"></i> Lancer la Simulation';
+        btn.innerHTML = '<i class="fas fa-play"></i> Simuler';
+        loading.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+    });
+});
+
+// Bouton VALIDER
+document.getElementById('btn-valider').addEventListener('click', function() {
+    if (simulationData.length === 0) {
+        alert('Veuillez d\'abord lancer une simulation.');
+        return;
+    }
+    
+    if (!confirm('Êtes-vous sûr de vouloir valider cette distribution ?\n\nCette action est irréversible.')) {
+        return;
+    }
+    
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Validation...';
+    
+    fetch('<?= BASE_URL ?>/distributions/valider', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Recharger la page pour voir les changements
+            window.location.reload();
+        } else {
+            alert('Erreur: ' + data.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Valider la Distribution';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de la validation.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Valider la Distribution';
     });
 });
 </script>
