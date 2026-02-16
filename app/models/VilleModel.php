@@ -26,9 +26,13 @@ class VilleModel
     }
 
     public function getVilleById($idVille) {
-        $sql = $this->db->prepare("SELECT v.id, v.nom, v.id_region, r.nom as region_nom FROM ville v LEFT JOIN region r ON v.id_region = r.id WHERE v.idVille = ?");
+        $sql = $this->db->prepare("SELECT v.id, v.nom, v.id_region, r.nom as region_nom FROM ville v LEFT JOIN region r ON v.id_region = r.id WHERE v.id = ?");
         $sql->execute([$idVille]);
         return $sql->fetch();
+    }
+    
+    public function getById($idVille) {
+        return $this->getVilleById($idVille);
     }
 
     public function updateVille($id) {
