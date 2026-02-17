@@ -22,19 +22,19 @@ ob_start();
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv1" value="Niv1">
                 <label class="form-check-label" for="type-niv1">
-                    <strong>Mode 1</strong>
+                    <strong>Mode 1 : Par ordre de date et de saisie</strong>
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv2" value="Niv2">
                 <label class="form-check-label" for="type-niv2">
-                    <strong>Mode 2</strong>
+                    <strong>Mode 2 : Par ordre croissant</strong>
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv3" value="Niv3">
                 <label class="form-check-label" for="type-niv3">
-                    <strong>Mode 3</strong>
+                    <strong>Mode 3 : Par proporitonnalite</strong>
                 </label>
             </div>
         </div>
