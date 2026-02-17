@@ -1,3 +1,65 @@
+USE bngrc;
+
+-- Fusion des données de :
+-- - 20260216-02.sql
+-- - 20260217-add-ordre-column.sql
+-- Note: le fichier 20260217-add-ordre-column.sql ne contient pas d'INSERT/UPDATE de données,
+-- uniquement des modifications de structure et de vues.
+
+DELETE FROM distribution;
+DELETE FROM don_article;
+DELETE FROM don;
+DELETE FROM besoin_article;
+DELETE FROM besoin;
+DELETE FROM ville;
+DELETE FROM region;
+DELETE FROM article;
+DELETE FROM type_besoin;
+
+ALTER TABLE distribution AUTO_INCREMENT = 1;
+ALTER TABLE don_article AUTO_INCREMENT = 1;
+ALTER TABLE don AUTO_INCREMENT = 1;
+ALTER TABLE besoin_article AUTO_INCREMENT = 1;
+ALTER TABLE besoin AUTO_INCREMENT = 1;
+ALTER TABLE ville AUTO_INCREMENT = 1;
+ALTER TABLE region AUTO_INCREMENT = 1;
+ALTER TABLE article AUTO_INCREMENT = 1;
+ALTER TABLE type_besoin AUTO_INCREMENT = 1;
+
+INSERT INTO region (nom) VALUES
+('Alaotra-Mangoro'),
+('Amoron''i Mania'),
+('Analamanga'),
+('Analanjirofo'),
+('Androy'),
+('Anosy'),
+('Atsimo-Andrefana'),
+('Atsimo-Atsinanana'),
+('Atsinanana'),
+('Betsiboka'),
+('Boeny'),
+('Bongolava'),
+('Diana'),
+('Fitovinany'),
+('Ihorombe'),
+('Itasy'),
+('Melaky'),
+('Menabe'),
+('Sava'),
+('Sofia'),
+('Vakinankaratra'),
+('Vatovavy'),
+('Vatovavy-Fitovinany');
+
+INSERT INTO type_besoin (libelle) VALUES
+('Nature'),
+('Materiaux'),
+('Argent');
+
+-- ==========================================
+-- Données additionnelles avec ordre de priorité
+-- Source: 20260217-data-with-ordre.sql
+-- ==========================================
 
 -- Villes du jeu de données
 INSERT INTO ville (nom, id_region) VALUES 
@@ -103,12 +165,12 @@ INSERT INTO besoin_article (id_besoin, id_article, quantite, ordre) VALUES
 -- Vérification des données insérées
 SELECT 'Vérification des besoins avec ordre:' AS info;
 SELECT 
-    b.id AS besoin_id,
-    v.nom AS ville,
-    a.nom AS article,
-    ba.quantite,
-    ba.ordre,
-    b.date_saisie
+	b.id AS besoin_id,
+	v.nom AS ville,
+	a.nom AS article,
+	ba.quantite,
+	ba.ordre,
+	b.date_saisie
 FROM besoin_article ba
 JOIN besoin b ON ba.id_besoin = b.id
 JOIN ville v ON b.id_ville = v.id
