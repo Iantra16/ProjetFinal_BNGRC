@@ -23,7 +23,7 @@ class DistributoinController
 
         if ($villeId) {
             // Récupérer les informations de la ville
-            $villeModel = new \app\models\VilleModel($db);
+            $villeModel = new VilleModel($db);
             $ville = $villeModel->getById($villeId);
             
             if (!$ville) {

@@ -196,6 +196,82 @@ class DistributionModel
                 continue;
             }
 
+            $ListeDistributoin = array_merge(
+                $ListeDistributoin,
+                $this->DistributeDonProportionnel($dons, $besoins)
+            );
+        }
+        return $ListeDistributoin;
+    }
+
+    private function DistributeDonProportionnel($don, $besoins) {
+        $liste = [];
+        $stock_restant = $don['stock_restant'];
+
+        // On boucle tant qu'il reste du stock et que les besoins ne sont pas vides
+        while ($stock_restant > 0 && !empty($besoins)) {
+            $total_besoins = 0;
+            foreach ($besoins as $besoin) {
+                $total_besoins += $besoin['reste_a_combler'];
+            }
+
+            if ($total_besoins <= 0) {
+                break;
+            }
+
+            $total_distribue = 0;
+
+            foreach ($besoins as $index => $besoin) {
+                if ($stock_restant <= 0) {
+                    break;
+                }
+
+                $proportion = ($besoin['reste_a_combler'] * $stock_restant) / $total_besoins;
+                $distribuer = (int) floor($proportion);
+
+                if ($distribuer > 0) {
+                    $distribuer = min($distribuer, $stock_restant, $besoin['reste_a_combler']);
+                    $stock_restant -= $distribuer;
+                    $besoins[$index]['reste_a_combler'] -= $distribuer;
+                    $total_distribue += $distribuer;
+
+                    $liste[] = [
+                        'id_don_article' => $don['id_don_article'],
+                        'id_besoin_article' => $besoin['id_besoin_article'],
+                        'quantite_attribuee' => $distribuer,
+                        'article_nom' => $don['article'],
+                        'ville_nom' => $besoin['ville'],
+                        'unite' => $don['unite']
+                    ];
+                }
+            }
+
+            // Si aucune distribution n'a ete possible, on stoppe pour eviter une boucle infinie
+            if ($total_distribue === 0) {
+                break;
+            }
+
+            // Retirer les besoins deja combles
+            $besoins = array_values(array_filter($besoins, function($besoin) {
+                return $besoin['reste_a_combler'] > 0;
+            }));
+        }
+
+        return $liste;
+    }
+
+    public function DistributoinDons_Proportionnelle_Avancee($dons_ville_detaille) { 
+        $ListeDistributoin = [];
+        
+        foreach ($dons_ville_detaille as $dons) {
+            $besoinModel = new BesoinModel($this->db);
+            $besoins = $besoinModel->getReste_besoin_by_article_Date($dons['id_article']);
+            
+            // Éviter la division par zéro si aucun besoin n'existe pour cet article
+            if (empty($besoins)) {
+                continue;
+            }
+
             // Calcul du total des besoins pour cet article
             $total_besoins = 0;
             foreach ($besoins as $besoin) {
@@ -207,35 +283,72 @@ class DistributionModel
                 continue;
             }
 
-            // Calcul du coefficient de proportion
-            $coefficient = $dons['stock_restant'] / $total_besoins;
+            $stock_dons = $dons['stock_restant'];
 
-            // Trier les besoins par ordre croissant (on donne d'abord ce qui demande moins)
-            usort($besoins, function($a, $b) {
-                return $a['reste_a_combler'] <=> $b['reste_a_combler'];
-            });
+            // Étape 1 : Calcul de la distribution proportionnelle arrondie inférieur + stockage des décimales
+            $distributions = [];
+            $total_distribue = 0;
 
-            // Distribution proportionnelle
-            foreach ($besoins as $besoin) {
-                // Calcul de la proportion à distribuer
-                $proportion = $besoin['reste_a_combler'] * $coefficient;
-                
-                // Arrondir avec int (tronquer la partie décimale)
-                $distribuer = (int) $proportion;
-                
-                // On n'ajoute que si on distribue effectivement quelque chose
-                if ($distribuer > 0) {
+            foreach ($besoins as $index => $besoin) {
+                $proportion = ($besoin['reste_a_combler'] * $stock_dons) / $total_besoins;
+                $distribue = (int) floor($proportion);
+                $decimal = $proportion - $distribue;
+
+                $distributions[] = [
+                    'index' => $index,
+                    'besoin' => $besoin,
+                    'distribue' => $distribue,
+                    'decimal' => $decimal,
+                    'article_nom' => $dons['article'],
+                    'ville_nom' => $besoin['ville'],
+                    'unite' => $dons['unite'],
+                    'id_don_article' => $dons['id_don_article'],
+                    'id_besoin_article' => $besoin['id_besoin_article']
+                ];
+
+                $total_distribue += $distribue;
+            }
+
+            // Étape 2 : Calcul du reste
+            $reste = $stock_dons - $total_distribue;
+
+            // Étape 3 : Tri des distributions par décimale décroissante (l'ordre original en cas d'égalité est maintenu grâce à l'index)
+            if ($reste > 0) {
+                usort($distributions, function($a, $b) {
+                    // Comparer les décimales en ordre décroissant
+                    if (abs($a['decimal'] - $b['decimal']) > 0.0001) {
+                        return $b['decimal'] <=> $a['decimal'];
+                    }
+                    // En cas d'égalité, garder l'ordre original
+                    return $a['index'] <=> $b['index'];
+                });
+
+                // Étape 4 : Distribution du reste
+                for ($i = 0; $i < $reste && $i < count($distributions); $i++) {
+                    $distributions[$i]['distribue'] += 1;
+                }
+
+                // Re-trier par index pour garder l'ordre original
+                usort($distributions, function($a, $b) {
+                    return $a['index'] <=> $b['index'];
+                });
+            }
+
+            // Étape 5 : Créer la liste de distribution
+            foreach ($distributions as $dist) {
+                if ($dist['distribue'] > 0) {
                     $ListeDistributoin[] = [
-                        'id_don_article' => $dons['id_don_article'],
-                        'id_besoin_article' => $besoin['id_besoin_article'],
-                        'quantite_attribuee' => $distribuer,
-                        'article_nom' => $dons['article'],
-                        'ville_nom' => $besoin['ville'],
-                        'unite' => $dons['unite']
+                        'id_don_article' => $dist['id_don_article'],
+                        'id_besoin_article' => $dist['id_besoin_article'],
+                        'quantite_attribuee' => $dist['distribue'],
+                        'article_nom' => $dist['article_nom'],
+                        'ville_nom' => $dist['ville_nom'],
+                        'unite' => $dist['unite']
                     ];
                 }
             }
         }
+        
         return $ListeDistributoin;
     }
 
