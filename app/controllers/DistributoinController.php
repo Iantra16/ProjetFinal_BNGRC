@@ -73,11 +73,13 @@ class DistributoinController
     public function Simulatoin_Distributoin() {
         $db = Flight::db();
         
+        $type = Flight::request()->data->type ?? 'Niv1';
+        
         $donModel = new DonModel($db);
         $stockDisponible = $donModel->Get_Reste_dons_disponibles();
         
         $distributionsModel = new DistributionModel($db);
-        $simulation = $distributionsModel->DistributoinDons($stockDisponible);
+        $simulation = $distributionsModel->DistributeDons($stockDisponible, $type);
         
         Flight::json($simulation);
     }
@@ -88,11 +90,14 @@ class DistributoinController
     public function Valider_Distribution() {
         $db = Flight::db();
         
+        $data = Flight::request()->data;
+        $type = $data->type ?? 'Niv1';
+        
         $donModel = new DonModel($db);
         $stockDisponible = $donModel->Get_Reste_dons_disponibles();
         
         $distributionsModel = new DistributionModel($db);
-        $distributions = $distributionsModel->DistributoinDons($stockDisponible);
+        $distributions = $distributionsModel->DistributeDons($stockDisponible, $type);
         
         if (empty($distributions)) {
             Flight::json([

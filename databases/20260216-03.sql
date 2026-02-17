@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW v_reste_dons_disponibles AS
 SELECT 
     da.id AS id_don_article,   
     a.id AS id_article,
+    d.date_don,
     a.nom AS article,
     -- Calcul direct du reste uniquement
     (da.quantite - COALESCE((
@@ -12,8 +13,10 @@ SELECT
     a.unite
 FROM don_article da
 JOIN article a ON da.id_article = a.id
+JOIN don d ON da.id_don = d.id
 -- On filtre pour ne voir que ce qui n'est pas encore épuisé
-HAVING stock_restant > 0;
+HAVING stock_restant > 0
+ORDER BY d.date_don ASC;
 select * from v_reste_dons_disponibles;
 
 CREATE OR REPLACE VIEW v_reste_total_dons_disponibles AS
@@ -45,6 +48,7 @@ SELECT
     ba.id AS id_besoin_article,
     v.nom AS ville,
     a.id AS id_article,
+    b.date_saisie AS date_besoin,
     a.nom AS article,
     -- Calcul du reste à combler (Demande - Somme des distributions reçues)
     (ba.quantite - COALESCE((
@@ -58,7 +62,8 @@ JOIN besoin b ON ba.id_besoin = b.id
 JOIN ville v ON b.id_ville = v.id
 JOIN article a ON ba.id_article = a.id
 -- Filtre pour ne garder que les besoins non terminés
-HAVING reste_a_combler > 0;
+HAVING reste_a_combler > 0
+ORDER BY b.date_saisie ASC;
 
 CREATE OR REPLACE VIEW v_historique_distributions_villes AS
 SELECT 

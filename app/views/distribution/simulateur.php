@@ -167,7 +167,11 @@ document.getElementById('btn-simuler').addEventListener('click', function() {
     loading.classList.remove('d-none');
 
     fetch('<?= BASE_URL ?>/distributions/simuler', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'type=' + selectedLevel.value
     })
     .then(response => response.json())
     .then(data => {
@@ -230,7 +234,10 @@ document.getElementById('btn-valider').addEventListener('click', function() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+            type: document.querySelector('input[name="type-distribution"]:checked').value
+        })
     })
     .then(response => response.json())
     .then(data => {
