@@ -3,14 +3,14 @@
         <div class="container-fluid">
             <a class="navbar-brand bngrc-brand" href="<?= BASE_URL ?>/">
                 <i class="fas fa-hands-helping"></i>
-                <span class="brand-text">BNGRC - Suivi des Dons</span>
+                <span class="brand-text">BNGRC - Suivi des collectes et des distributions de dons </span>
             </a>
             
             <button class="navbar-toggler sidebar-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
                 <i class="fas fa-bars"></i>
             </button>
 
-            <ul class="navbar-nav ms-auto bngrc-nav">
+            <!-- <ul class="navbar-nav ms-auto bngrc-nav">
                 <li class="nav-item">
                     <a href="<?= BASE_URL ?>/articles" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/articles') !== false ? ' active' : '' ?>">
                         <i class="fas fa-boxes"></i> Articles
@@ -56,6 +56,6 @@
                         <i class="fas fa-cogs"></i> Config
                     </a>
                 </li>
-            </ul>
+            </ul> -->
         </div>
     </nav>

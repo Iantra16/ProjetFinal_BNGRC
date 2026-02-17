@@ -23,6 +23,8 @@
 
     <?php include("header.php"); ?>
 
+    <?php include("sidebar.php"); ?>
+
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <div class="content">
