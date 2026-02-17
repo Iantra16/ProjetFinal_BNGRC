@@ -22,19 +22,19 @@ ob_start();
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv1" value="Niv1">
                 <label class="form-check-label" for="type-niv1">
-                    <strong>Par ordre de date et de saisie</strong>
+                    <strong>Mode 1</strong>
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv2" value="Niv2">
                 <label class="form-check-label" for="type-niv2">
-                    <strong>Celui qui a le plus petit, recoit en premier</strong>
+                    <strong>Mode 2</strong>
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="type-distribution" id="type-niv3" value="Niv3">
                 <label class="form-check-label" for="type-niv3">
-                    <strong>Proportionnel</strong>
+                    <strong>Mode 3</strong>
                 </label>
             </div>
         </div>
@@ -140,6 +140,30 @@ ob_start();
 
 <script>
 let simulationData = [];
+
+function resetSimulationUI() {
+    const btnSimuler = document.getElementById('btn-simuler');
+    const btnValider = document.getElementById('btn-valider');
+    const loading = document.getElementById('simulation-loading');
+    const placeholder = document.getElementById('simulation-placeholder');
+    const container = document.getElementById('simulation-container');
+    const resultBody = document.getElementById('result-body');
+
+    simulationData = [];
+    resultBody.innerHTML = '';
+    loading.classList.add('d-none');
+    container.classList.add('d-none');
+    placeholder.classList.remove('d-none');
+    btnValider.classList.add('d-none');
+    btnValider.disabled = true;
+    btnSimuler.disabled = false;
+    btnSimuler.innerHTML = '<i class="fas fa-play"></i> Simuler';
+}
+
+// Bouton REINITIALISER
+document.getElementById('btn-reinitialiser').addEventListener('click', function() {
+    resetSimulationUI();
+});
 
 // Bouton SIMULER
 document.getElementById('btn-simuler').addEventListener('click', function() {
