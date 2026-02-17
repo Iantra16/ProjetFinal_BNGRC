@@ -37,22 +37,22 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/distributions/simulateur" class=4"nav-link<?= strpos($_SERVER['REQUEST_URI'], '/simulateur') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/distributions/simulateur" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/simulateur') !== false ? ' active' : '' ?>">
                         <i class="fas fa-magic"></i> Simulateur
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/achats" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/achats') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/achats" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/achats') !== false ? ' active' : '' ?>">
                         <i class="fas fa-shopping-cart"></i> Achats
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/recap" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/recap') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/recap" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/recap') !== false ? ' active' : '' ?>">
                         <i class="fas fa-chart-pie"></i> Récap
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/config" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/config') !== false ? ' active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/config" class="nav-link<?= strpos($_SERVER['REQUEST_URI'], '/config') !== false ? ' active' : '' ?>">
                         <i class="fas fa-cogs"></i> Config
                     </a>
                 </li>

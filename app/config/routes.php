@@ -51,7 +51,7 @@ $router->group('', function (Router $router) use ($app) {
         $router->get('/', [$article_controller, 'add']);
 
         // Enregistrer un article
-        $router->post('/', [$article_controller, 'add']);
+        $router->post('/ajouter', [$article_controller, 'add']);
 
         
     });
