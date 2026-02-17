@@ -12,10 +12,42 @@ ob_start();
     </p>
 </div>
 
+<!-- Formulaire de sélection du type de distribution -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h6 class="mb-0"><i class="fas fa-layer-group"></i> Type de Distribution</h6>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-4">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="type-distribution" id="type-niv1" value="Niv1">
+                <label class="form-check-label" for="type-niv1">
+                    <strong>Par ordre de date et de saisie</strong>
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="type-distribution" id="type-niv2" value="Niv2">
+                <label class="form-check-label" for="type-niv2">
+                    <strong>Celui qui a le plus petit, recoit en premier</strong>
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="type-distribution" id="type-niv3" value="Niv3">
+                <label class="form-check-label" for="type-niv3">
+                    <strong>Proportionnel</strong>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-3">
     <div class="col-12 text-end">
         <button id="btn-simuler" class="btn btn-lg btn-success shadow me-2">
             <i class="fas fa-play"></i> Simuler
+        </button>
+        <button id="btn-reinitialiser" class="btn btn-lg btn-warning shadow me-2">
+            <i class="fas fa-sync-alt"></i> Réinitialiser
         </button>
         <button id="btn-valider" class="btn btn-lg btn-primary shadow d-none" disabled>
             <i class="fas fa-check-circle"></i> Valider la Distribution
@@ -111,6 +143,13 @@ let simulationData = [];
 
 // Bouton SIMULER
 document.getElementById('btn-simuler').addEventListener('click', function() {
+    // Vérifier si un niveau a été sélectionné
+    const selectedLevel = document.querySelector('input[name="type-distribution"]:checked');
+    if (!selectedLevel) {
+        alert('Veuillez choisir un niveau de distribution avant de simuler.');
+        return;
+    }
+
     const btn = this;
     const btnValider = document.getElementById('btn-valider');
     const loading = document.getElementById('simulation-loading');
